@@ -10,6 +10,9 @@
             "role": "Author"
         }
     ],
+    "require": {
+        "composer-plugin-api": "1.0.0"
+    },
     "autoload": {
         "psr-4": {
             "Cake\\Composer\\": "src/"

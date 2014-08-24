@@ -1,7 +1,7 @@
 <?php
 namespace Cake\Composer\Plugin;
 
-use Cake\Composer\PluginInstaller;
+use Cake\Composer\Installer\PluginInstaller;
 use Composer\Composer;
 use Composer\IO\IOInterface;
 use Composer\Plugin\PluginInterface;
