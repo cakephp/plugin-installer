@@ -18,7 +18,7 @@ class PluginInstaller extends LibraryInstaller {
  *
  * @throws \RuntimeException
  */
-	public function getInstallPath(PackageInterface $package) {
+	public function getPackageBasePath(PackageInterface $package) {
 		$extra = $package->getExtra();
 		if (!empty($extra['installer-name'])) {
 			return 'plugins/' . $extra['installer-name'];
