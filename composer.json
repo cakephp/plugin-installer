@@ -1,0 +1,21 @@
+{
+    "name": "admad/plugin-installer",
+    "description": "A composer installer for CakePHP plugins.",
+    "type": "composer-plugin",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "ADmad",
+            "homepage": "https://github.com/ADmad",
+            "role": "Author"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Cake\\Composer": "src/"
+        }
+    },
+    "extra": {
+        "class": "Cake\\Composer\\PluginInstaller"
+    }
+}
