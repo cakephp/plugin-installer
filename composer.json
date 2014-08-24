@@ -16,6 +16,6 @@
         }
     },
     "extra": {
-        "class": "Cake\\Composer\\PluginInstallerPlugin"
+        "class": "Cake\\Composer\\Plugin\\PluginInstallerPlugin"
     }
 }

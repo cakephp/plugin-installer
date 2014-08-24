@@ -1,5 +1,5 @@
 <?php
-namespace Cake\Composer;
+namespace Cake\Composer\Plugin;
 
 use Cake\Composer\PluginInstaller;
 use Composer\Composer;

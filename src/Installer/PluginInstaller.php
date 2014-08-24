@@ -1,5 +1,5 @@
 <?php
-namespace Cake\Composer;
+namespace Cake\Composer\Installer;
 
 use Composer\Installer\LibraryInstaller;
 use Composer\Package\PackageInterface;
