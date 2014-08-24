@@ -3,15 +3,16 @@ namespace Cake\Test\TestCase\Composer\Installer;
 
 use Cake\Composer\Installer\PluginInstaller;
 use Composer\Composer;
+use Composer\Config;
 use Composer\Package\Package;
 use Composer\Package\RootPackage;
 use Composer\Repository\RepositoryManager;
 
 class PluginInstallerTest extends \PHPUnit_Framework_TestCase {
 
-	public $composer;
+	public $package;
 
-	public $io;
+	public $installer;
 
 /**
  * setUp
@@ -20,13 +21,26 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase {
  */
 	public function setUp() {
 		$this->package = new Package('CamelCased', '1.0', '1.0');
-		$this->io = $this->getMock('Composer\IO\PackageInterface');
-		$this->composer = new Composer();
+		$this->package->setType('cakephp-plugin');
+
+		$composer = new Composer();
+		$config = $this->getMock('Composer\Config');
+		$composer->setConfig($config);
+
+		$io = $this->getMock('Composer\IO\IOInterface');
+		$rm = new RepositoryManager(
+			$io,
+			$config
+		);
+		$composer->setRepositoryManager($rm);
+
+		$this->installer = new PluginInstaller($io, $composer);
 	}
 
 /**
- * Test if installer-name was set
+ * Test install path
  *
+ * @return void
  */
 	public function testGetInstallPath() {
 		$autoload = array(
@@ -35,17 +49,9 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase {
 			)
 		);
 		$this->package->setAutoload($autoload);
-		$this->package->setType('cakephp-plugin');
-		$rm = new RepositoryManager(
-			$this->getMock('Composer\IO\IOInterface'),
-			$this->getMock('Composer\Config')
-		);
-		$this->composer->setRepositoryManager($rm);
-		$installer = new PluginInstaller($this->package, $this->composer);
 
-		$this->setCakephpVersion($rm, '3.0.0');
-		$path = $installer->getInstallPath($this->package, 'cakephp');
-		$this->assertEquals('FOC/Authenticate', $path);
+		$path = $this->installer->getInstallPath($this->package);
+		$this->assertEquals('plugins/FOC/Authenticate', $path);
 
 		$autoload = array(
 			'psr-4' => array(
@@ -54,21 +60,18 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase {
 			)
 		);
 		$this->package->setAutoload($autoload);
-		$this->package->setExtra(array());
-		$path = $installer->getInstallPath($this->package, 'cakephp');
-		$this->assertEquals('FOC/Acl', $path);
+		$path = $this->installer->getInstallPath($this->package);
+		$this->assertEquals('plugins/FOC/Acl', $path);
 
 		$autoload = array(
 			'psr-4' => array(
 				'Foo\Bar' => 'foo',
-				'Acme\Plugin\Test' => 'tests',
 				'Acme\Plugin' => './src'
 			)
 		);
 		$this->package->setAutoload($autoload);
-		$this->package->setExtra(array());
-		$path = $installer->getInstallPath($this->package, 'cakephp');
-		$this->assertEquals('Acme/Plugin', $path);
+		$path = $this->installer->getInstallPath($this->package);
+		$this->assertEquals('plugins/Acme/Plugin', $path);
 
 		$autoload = array(
 			'psr-4' => array(
@@ -77,9 +80,8 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase {
 			)
 		);
 		$this->package->setAutoload($autoload);
-		$this->package->setExtra(array());
-		$path = $installer->getInstallPath($this->package, 'cakephp');
-		$this->assertEquals('Foo', $path);
+		$path = $this->installer->getInstallPath($this->package);
+		$this->assertEquals('plugins/Foo', $path);
 
 		$autoload = array(
 			'psr-4' => array(
@@ -88,9 +90,8 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase {
 			)
 		);
 		$this->package->setAutoload($autoload);
-		$this->package->setExtra(array());
-		$path = $installer->getInstallPath($this->package, 'cakephp');
-		$this->assertEquals('Acme/Foo', $path);
+		$path = $this->installer->getInstallPath($this->package);
+		$this->assertEquals('plugins/Acme/Foo', $path);
 
 		$autoload = array(
 			'psr-4' => array(
@@ -99,9 +100,12 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase {
 			)
 		);
 		$this->package->setAutoload($autoload);
-		$this->package->setExtra(array());
-		$path = $installer->getInstallPath($this->package, 'cakephp');
-		$this->assertEquals('Acme/Foo', $path);
+		$path = $this->installer->getInstallPath($this->package);
+		$this->assertEquals('plugins/Acme/Foo', $path);
+
+		$this->package->setExtra(array('installer-name' => 'Baz'));
+		$path = $this->installer->getInstallPath($this->package);
+		$this->assertEquals('plugins/Baz', $path);
 	}
 
 }
