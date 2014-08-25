@@ -1,13 +1,12 @@
 {
-    "name": "admad/plugin-installer",
-    "description": "A composer installer for CakePHP plugins.",
+    "name": "cakephp/plugin-installer",
+    "description": "A composer installer for CakePHP 3.0+ plugins.",
     "type": "composer-installer",
     "license": "MIT",
     "authors": [
         {
-            "name": "ADmad",
-            "homepage": "https://github.com/ADmad",
-            "role": "Author"
+            "name": "CakePHP Community",
+            "homepage": "http://cakephp.org"
         }
     ],
     "require-dev": {

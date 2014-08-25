@@ -1,7 +1,7 @@
 CakePHP Plugin Installer
 ========================
 
-A composer plugin for installing CakePHP 3.0 plugins.
+A composer installer for installing CakePHP 3.0+ plugins.
 
 Usage
 -----
@@ -9,10 +9,10 @@ Usage
 In your CakePHP plugin folder run:
 
 ```
-composer require admad/plugin-installer:dev-master
+composer require cakephp/plugin-installer:dev-master
 ```
 
 or add
 
-`"admad/plugin-installer": "dev-master"` to the `require` section of your
+`"cakephp/plugin-installer": "dev-master"` to the `require` section of your
 plugin's `composer.json`.
