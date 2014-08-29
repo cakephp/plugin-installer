@@ -85,6 +85,16 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase {
 
 		$autoload = array(
 			'psr-4' => array(
+				'Foo\Bar' => 'bar',
+				'Foo' => '.'
+			)
+		);
+		$this->package->setAutoload($autoload);
+		$path = $this->installer->getInstallPath($this->package);
+		$this->assertEquals('plugins/Foo', $path);
+
+		$autoload = array(
+			'psr-4' => array(
 				'Acme\Foo\Bar' => 'bar',
 				'Acme\Foo' => ''
 			)

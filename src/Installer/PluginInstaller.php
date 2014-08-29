@@ -43,9 +43,11 @@ class PluginInstaller extends LibraryInstaller {
 				break;
 			}
 
-			$key = array_search('', $pathMap, true);
-			if ($key !== false) {
-				$primaryNS = $key;
+			foreach (['', '.'] as $path) {
+				$key = array_search($path, $pathMap, true);
+				if ($key !== false) {
+					$primaryNS = $key;
+				}
 			}
 			break;
 		}
