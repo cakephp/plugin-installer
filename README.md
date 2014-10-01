@@ -9,10 +9,10 @@ Usage
 In your CakePHP plugin folder run:
 
 ```
-composer require cakephp/plugin-installer:dev-master
+composer require cakephp/plugin-installer:*
 ```
 
 or add
 
-`"cakephp/plugin-installer": "dev-master"` to the `require` section of your
+`"cakephp/plugin-installer": "*"` to the `require` section of your
 plugin's `composer.json`.
