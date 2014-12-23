@@ -53,7 +53,10 @@ class PluginInstaller extends LibraryInstaller {
 		}
 
 		if (!$primaryNS) {
-			throw new \RuntimeException('Unable to get CakePHP plugin name.');
+			throw new \RuntimeException(
+				"Unable to get plugin name. Ensure you have added proper 'autoload' section
+				to your plugin's config as stated in README on https://github.com/cakephp/plugin-installer"
+			);
 		}
 
 		return 'plugins/' . trim(str_replace('\\', '/', $primaryNS), '/');
