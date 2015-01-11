@@ -3,6 +3,7 @@ namespace Cake\Composer\Installer;
 
 use Composer\Installer\LibraryInstaller;
 use Composer\Package\PackageInterface;
+use RuntimeException;
 
 class PluginInstaller extends LibraryInstaller
 {
@@ -56,9 +57,12 @@ class PluginInstaller extends LibraryInstaller
         }
 
         if (!$primaryNS) {
-            throw new \RuntimeException(
-                "Unable to get plugin name. Ensure you have added proper 'autoload' section
-				to your plugin's config as stated in README on https://github.com/cakephp/plugin-installer"
+            throw new RuntimeException(
+                sprintf(
+                	"Unable to get plugin name for package %s. 
+                	Ensure you have added proper 'autoload' section to your plugin's config as stated in README on https://github.com/cakephp/plugin-installer", 
+                	$package->getName()
+                )
             );
         }
 
