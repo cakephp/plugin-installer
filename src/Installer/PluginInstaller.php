@@ -23,7 +23,7 @@ class PluginInstaller extends LibraryInstaller
     {
         parent::installCode($package);
         $path = $this->getInstallPath($package);
-        $this->setConfig($package->getName(), $path);
+        $this->updateConfig($package->getName(), $path);
     }
 
     /**
@@ -33,7 +33,7 @@ class PluginInstaller extends LibraryInstaller
     {
         parent::updateCode($initial, $target);
         $path = $this->getInstallPath($package);
-        $this->setConfig($package->getName(), $path);
+        $this->updateConfig($package->getName(), $path);
     }
 
     /**
@@ -43,7 +43,7 @@ class PluginInstaller extends LibraryInstaller
     {
         parent::removeCode($package);
         $path = $this->getInstallPath($package);
-        $this->setConfig($package->getName(), null);
+        $this->updateConfig($package->getName(), null);
     }
 
     /**
@@ -96,12 +96,76 @@ class PluginInstaller extends LibraryInstaller
     }
 
     /**
-     * Set the plugin path for a given package.
+     * Update the plugin path for a given package.
      *
      * @param string $name The plugin name being installed.
      * @param string $path The path, the plugin is being installed into.
      */
-    protected function setConfig($name, $path)
+    public function updateConfig($name, $path)
     {
+        $root = dirname($this->vendorDir);
+        $configFile = $root . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'plugins.php';
+        $this->ensureConfigFile($configFile);
+
+        include $configFile;
+        if (!isset($config)) {
+            $this->io->write(
+                'ERROR - Your `config/plugins.php` did not define a $config variable. ' .
+                'Plugin path configuration not updated.'
+            );
+            return;
+        }
+        if (!isset($config['plugins'])) {
+            $config['plugins'] = [];
+        }
+        if ($path == null) {
+            unset($config['plugins'][$name]);
+        } else {
+            $config['plugins'][$name] = $path;
+        }
+        $this->writeConfig($configFile, $config);
+    }
+
+    /**
+     * Ensure that the config/plugins.php file exists.
+     *
+     * @param string $path the config file path.
+     * @return void
+     */
+    protected function ensureConfigFile($path)
+    {
+        if (file_exists($path)) {
+            if ($this->io->isVerbose()) {
+                $this->io->write('config/plugins.php exists.');
+            }
+            return;
+        }
+        $contents = <<<'PHP'
+<?php
+$config = [
+    'plugins' => []
+];
+PHP;
+        if (!is_dir(dirname($path))) {
+            mkdir(dirname($path));
+        }
+        file_put_contents($path, $contents);
+
+        if ($this->io->isVerbose()) {
+            $this->io->write('Created config/plugins.php');
+        }
+    }
+
+    /**
+     * Dump the generate configuration out to a file.
+     *
+     * @param string $path The path to write.
+     * @param array $config The config data to write.
+     * @return void
+     */
+    protected function writeConfig($path, $config)
+    {
+        $contents = '<?php' . "\n" . '$config = ' . var_export($config, true) . ';';
+        file_put_contents($path, $contents);
     }
 }
