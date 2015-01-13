@@ -39,6 +39,79 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase
         $this->installer = new PluginInstaller($io, $composer);
     }
 
+    public function testPrimaryNamespace()
+    {
+        $autoload = array(
+            'psr-4' => array(
+                'FOC\\Authenticate' => ''
+            )
+        );
+        $this->package->setAutoload($autoload);
+
+        $name = $this->installer->primaryNamespace($this->package);
+        $this->assertEquals('FOC\Authenticate', $name);
+
+        $autoload = array(
+            'psr-4' => array(
+                'FOC\Acl\Test' => './tests',
+                'FOC\Acl' => ''
+            )
+        );
+        $this->package->setAutoload($autoload);
+        $name = $this->installer->primaryNamespace($this->package);
+        $this->assertEquals('FOC\Acl', $name);
+
+        $autoload = array(
+            'psr-4' => array(
+                'Foo\Bar' => 'foo',
+                'Acme\Plugin' => './src'
+            )
+        );
+        $this->package->setAutoload($autoload);
+        $name = $this->installer->primaryNamespace($this->package);
+        $this->assertEquals('Acme\Plugin', $name);
+
+        $autoload = array(
+            'psr-4' => array(
+                'Foo\Bar' => 'bar',
+                'Foo' => ''
+            )
+        );
+        $this->package->setAutoload($autoload);
+        $name = $this->installer->primaryNamespace($this->package);
+        $this->assertEquals('Foo', $name);
+
+        $autoload = array(
+            'psr-4' => array(
+                'Foo\Bar' => 'bar',
+                'Foo' => '.'
+            )
+        );
+        $this->package->setAutoload($autoload);
+        $name = $this->installer->primaryNamespace($this->package);
+        $this->assertEquals('Foo', $name);
+
+        $autoload = array(
+            'psr-4' => array(
+                'Acme\Foo\Bar' => 'bar',
+                'Acme\Foo' => ''
+            )
+        );
+        $this->package->setAutoload($autoload);
+        $name = $this->installer->primaryNamespace($this->package);
+        $this->assertEquals('Acme\Foo', $name);
+
+        $autoload = array(
+            'psr-4' => array(
+                'Acme\Foo\Bar' => '',
+                'Acme\Foo' => 'src'
+            )
+        );
+        $this->package->setAutoload($autoload);
+        $name = $this->installer->primaryName($this->package);
+        $this->assertEquals('Acme\Foo', $name);
+    }
+
     /**
      * Test install path
      *

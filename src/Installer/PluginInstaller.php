@@ -18,17 +18,44 @@ class PluginInstaller extends LibraryInstaller
 
     /**
      * {@inheritDoc}
-     *
-     * @throws \RuntimeException
      */
-    public function getPackageBasePath(PackageInterface $package)
+    protected function installCode(PackageInterface $package)
     {
-        $extra = $package->getExtra();
-        if (!empty($extra['installer-name'])) {
-            return 'plugins/' . $extra['installer-name'];
-        }
+        parent::installCode($package);
+        $path = $this->getInstallPath($package);
+        $this->setConfig($package->getName(), $path);
+    }
 
-        $primaryNS = null;
+    /**
+     * {@inheritDoc}
+     */
+    protected function updateCode(PackageInterface $initial, PackageInterface $target)
+    {
+        parent::updateCode($initial, $target);
+        $path = $this->getInstallPath($package);
+        $this->setConfig($package->getName(), $path);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function removeCode(PackageInterface $package)
+    {
+        parent::removeCode($package);
+        $path = $this->getInstallPath($package);
+        $this->setConfig($package->getName(), null);
+    }
+
+    /**
+     * Get the primary namespace for a plugin package.
+     *
+     * @param \Composer\Package\PackageInterface $package
+     * @return string The package's primary namespace.
+     * @throws \RuntimeException When the package's primary namespace cannot be determined.
+     */
+    public function primaryNamespace($package)
+    {
+        $primaryNs = null;
         $autoLoad = $package->getAutoload();
         foreach ($autoLoad as $type => $pathMap) {
             if ($type !== 'psr-4') {
@@ -37,26 +64,26 @@ class PluginInstaller extends LibraryInstaller
             $count = count($pathMap);
 
             if ($count === 1) {
-                $primaryNS = key($pathMap);
+                $primaryNs = key($pathMap);
                 break;
             }
 
             $matches = preg_grep('#^(\./)?src/?$#', $pathMap);
             if ($matches) {
-                $primaryNS = key($matches);
+                $primaryNs = key($matches);
                 break;
             }
 
             foreach (['', '.'] as $path) {
                 $key = array_search($path, $pathMap, true);
                 if ($key !== false) {
-                    $primaryNS = $key;
+                    $primaryNs = $key;
                 }
             }
             break;
         }
 
-        if (!$primaryNS) {
+        if (!$primaryNs) {
             throw new RuntimeException(
                 sprintf(
                     "Unable to get plugin name for package %s. 
@@ -65,7 +92,16 @@ class PluginInstaller extends LibraryInstaller
                 )
             );
         }
+        return $primaryNs;
+    }
 
-        return 'plugins/' . trim(str_replace('\\', '/', $primaryNS), '/');
+    /**
+     * Set the plugin path for a given package.
+     *
+     * @param string $name The plugin name being installed.
+     * @param string $path The path, the plugin is being installed into.
+     */
+    protected function setConfig($name, $path)
+    {
     }
 }
