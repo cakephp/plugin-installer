@@ -59,9 +59,9 @@ class PluginInstaller extends LibraryInstaller
         if (!$primaryNS) {
             throw new RuntimeException(
                 sprintf(
-                	"Unable to get plugin name for package %s. 
-                	Ensure you have added proper 'autoload' section to your plugin's config as stated in README on https://github.com/cakephp/plugin-installer", 
-                	$package->getName()
+                    "Unable to get plugin name for package %s. 
+                    Ensure you have added proper 'autoload' section to your plugin's config as stated in README on https://github.com/cakephp/plugin-installer",
+                    $package->getName()
                 )
             );
         }
