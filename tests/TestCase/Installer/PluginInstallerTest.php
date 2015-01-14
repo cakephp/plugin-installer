@@ -141,7 +141,7 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase
      */
     public function testUpdateConfigAddPath()
     {
-        file_put_contents($this->path . '/config/plugins.php', '<?php return ["Bake" => "/some/path"];');
+        file_put_contents($this->path . '/config/plugins.php', '<?php $config = ["plugins" => ["Bake" => "/some/path"]];');
 
         $this->installer->updateConfig('DebugKit', '/vendor/cakephp/debugkit');
         $contents = file_get_contents($this->path . '/config/plugins.php');
@@ -159,7 +159,7 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase
     {
         file_put_contents(
             $this->path . '/config/plugins.php',
-            '<?php return ["Bake" => "/some/path"];'
+            '<?php $config = ["plugins" => ["Bake" => "/some/path"]];'
         );
 
         $this->installer->updateConfig('Bake', null);

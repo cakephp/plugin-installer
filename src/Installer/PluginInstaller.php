@@ -92,14 +92,14 @@ class PluginInstaller extends LibraryInstaller
 
         $config = $configEngine->read('plugins');
         if ($path === null) {
-            unset($config[$name]);
+            unset($config['plugins'][$name]);
         } else {
             $path = str_replace(
                 DIRECTORY_SEPARATOR . DIRECTORY_SEPARATOR,
                 DIRECTORY_SEPARATOR,
                 $path . DIRECTORY_SEPARATOR
             );
-            $config[$name] = $path;
+            $config['plugins'][$name] = $path;
         }
         $configEngine->dump('plugins', $config);
     }
