@@ -74,7 +74,7 @@ class PluginInstaller extends LibraryInstaller
         parent::uninstall($repo, $package);
         $path = $this->getInstallPath($package);
         $ns = $this->primaryNamespace($package);
-        $this->updateConfig($ns, $path);
+        $this->updateConfig($ns, null);
     }
 
     /**
