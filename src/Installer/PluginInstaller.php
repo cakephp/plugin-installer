@@ -18,17 +18,47 @@ class PluginInstaller extends LibraryInstaller
 
     /**
      * {@inheritDoc}
-     *
-     * @throws \RuntimeException
      */
-    public function getPackageBasePath(PackageInterface $package)
+    protected function installCode(PackageInterface $package)
     {
-        $extra = $package->getExtra();
-        if (!empty($extra['installer-name'])) {
-            return 'plugins/' . $extra['installer-name'];
-        }
+        parent::installCode($package);
+        $path = $this->getInstallPath($package);
+        $ns = $this->primaryNamespace($package);
+        $this->updateConfig($ns, $path);
+    }
 
-        $primaryNS = null;
+    /**
+     * {@inheritDoc}
+     */
+    protected function updateCode(PackageInterface $initial, PackageInterface $target)
+    {
+        parent::updateCode($initial, $target);
+        $path = $this->getInstallPath($package);
+        $ns = $this->primaryNamespace($package);
+        $this->updateConfig($ns, $path);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function removeCode(PackageInterface $package)
+    {
+        parent::removeCode($package);
+        $path = $this->getInstallPath($package);
+        $ns = $this->primaryNamespace($package);
+        $this->updateConfig($ns, null);
+    }
+
+    /**
+     * Get the primary namespace for a plugin package.
+     *
+     * @param \Composer\Package\PackageInterface $package
+     * @return string The package's primary namespace.
+     * @throws \RuntimeException When the package's primary namespace cannot be determined.
+     */
+    public function primaryNamespace($package)
+    {
+        $primaryNs = null;
         $autoLoad = $package->getAutoload();
         foreach ($autoLoad as $type => $pathMap) {
             if ($type !== 'psr-4') {
@@ -37,35 +67,113 @@ class PluginInstaller extends LibraryInstaller
             $count = count($pathMap);
 
             if ($count === 1) {
-                $primaryNS = key($pathMap);
+                $primaryNs = key($pathMap);
                 break;
             }
 
             $matches = preg_grep('#^(\./)?src/?$#', $pathMap);
             if ($matches) {
-                $primaryNS = key($matches);
+                $primaryNs = key($matches);
                 break;
             }
 
             foreach (['', '.'] as $path) {
                 $key = array_search($path, $pathMap, true);
                 if ($key !== false) {
-                    $primaryNS = $key;
+                    $primaryNs = $key;
                 }
             }
             break;
         }
 
-        if (!$primaryNS) {
+        if (!$primaryNs) {
             throw new RuntimeException(
                 sprintf(
-                	"Unable to get plugin name for package %s. 
-                	Ensure you have added proper 'autoload' section to your plugin's config as stated in README on https://github.com/cakephp/plugin-installer", 
-                	$package->getName()
+                    "Unable to get plugin name for package %s. 
+                    Ensure you have added proper 'autoload' section to your plugin's config as stated in README on https://github.com/cakephp/plugin-installer",
+                    $package->getName()
                 )
             );
         }
+        return trim($primaryNs, '\\');
+    }
 
-        return 'plugins/' . trim(str_replace('\\', '/', $primaryNS), '/');
+    /**
+     * Update the plugin path for a given package.
+     *
+     * @param string $name The plugin name being installed.
+     * @param string $path The path, the plugin is being installed into.
+     */
+    public function updateConfig($name, $path)
+    {
+        $root = dirname($this->vendorDir);
+        $configFile = $root . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'plugins.php';
+        $this->ensureConfigFile($configFile);
+
+        include $configFile;
+        if (!isset($config)) {
+            $this->io->write(
+                'ERROR - Your `config/plugins.php` did not define a $config variable. ' .
+                'Plugin path configuration not updated.'
+            );
+            return;
+        }
+        if (!isset($config['plugins'])) {
+            $config['plugins'] = [];
+        }
+        if ($path == null) {
+            unset($config['plugins'][$name]);
+        } else {
+            $path = str_replace(
+                DIRECTORY_SEPARATOR . DIRECTORY_SEPARATOR,
+                DIRECTORY_SEPARATOR,
+                $path . DIRECTORY_SEPARATOR
+            );
+            $config['plugins'][$name] = $path;
+        }
+        $this->writeConfig($configFile, $config);
+    }
+
+    /**
+     * Ensure that the config/plugins.php file exists.
+     *
+     * @param string $path the config file path.
+     * @return void
+     */
+    protected function ensureConfigFile($path)
+    {
+        if (file_exists($path)) {
+            if ($this->io->isVerbose()) {
+                $this->io->write('config/plugins.php exists.');
+            }
+            return;
+        }
+        $contents = <<<'PHP'
+<?php
+$config = [
+    'plugins' => []
+];
+PHP;
+        if (!is_dir(dirname($path))) {
+            mkdir(dirname($path));
+        }
+        file_put_contents($path, $contents);
+
+        if ($this->io->isVerbose()) {
+            $this->io->write('Created config/plugins.php');
+        }
+    }
+
+    /**
+     * Dump the generate configuration out to a file.
+     *
+     * @param string $path The path to write.
+     * @param array $config The config data to write.
+     * @return void
+     */
+    protected function writeConfig($path, $config)
+    {
+        $contents = '<?php' . "\n" . '$config = ' . var_export($config, true) . ';';
+        file_put_contents($path, $contents);
     }
 }
