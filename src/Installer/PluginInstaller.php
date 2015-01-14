@@ -31,7 +31,8 @@ class PluginInstaller extends LibraryInstaller
      * @param \Composer\Repository\InstalledRepositoryInterface $repo Repository in which to check.
      * @param \Composer\Package\PackageInterface $package Package instance.
      */
-    public function install(InstalledRepositoryInterface $repo, PackageInterface $package) {
+    public function install(InstalledRepositoryInterface $repo, PackageInterface $package)
+    {
         parent::install($repo, $package);
         $path = $this->getInstallPath($package);
         $ns = $this->primaryNamespace($package);
@@ -68,7 +69,8 @@ class PluginInstaller extends LibraryInstaller
      * @param \Composer\Repository\InstalledRepositoryInterface $repo Repository in which to check.
      * @param \Composer\Package\PackageInterface $package Package instance.
      */
-    public function uninstall(InstalledRepositoryInterface $repo, PackageInterface $package) {
+    public function uninstall(InstalledRepositoryInterface $repo, PackageInterface $package)
+    {
         parent::uninstall($repo, $package);
         $path = $this->getInstallPath($package);
         $ns = $this->primaryNamespace($package);
@@ -99,7 +101,7 @@ class PluginInstaller extends LibraryInstaller
             );
             $config[$name] = $path;
         }
-        $configEngine->dump($config);
+        $configEngine->dump('plugins', $config);
     }
 
     /**
