@@ -10,7 +10,8 @@
         }
     ],
     "require-dev": {
-        "composer/composer": "1.0.*@dev"
+        "composer/composer": "1.0.*@dev",
+        "cakephp/core": "dev-master"
     },
     "autoload": {
         "psr-4": {
@@ -19,5 +20,6 @@
     },
     "extra": {
         "class": "Cake\\Composer\\Installer\\PluginInstaller"
-    }
+    },
+    "minimum-stability": "dev"
 }
