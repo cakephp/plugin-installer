@@ -23,7 +23,8 @@ class PluginInstaller extends LibraryInstaller
     {
         parent::installCode($package);
         $path = $this->getInstallPath($package);
-        $this->updateConfig($package->getName(), $path);
+        $ns = $this->primaryNamespace($package);
+        $this->updateConfig($ns, $path);
     }
 
     /**
@@ -33,7 +34,8 @@ class PluginInstaller extends LibraryInstaller
     {
         parent::updateCode($initial, $target);
         $path = $this->getInstallPath($package);
-        $this->updateConfig($package->getName(), $path);
+        $ns = $this->primaryNamespace($package);
+        $this->updateConfig($ns, $path);
     }
 
     /**
@@ -43,7 +45,8 @@ class PluginInstaller extends LibraryInstaller
     {
         parent::removeCode($package);
         $path = $this->getInstallPath($package);
-        $this->updateConfig($package->getName(), null);
+        $ns = $this->primaryNamespace($package);
+        $this->updateConfig($ns, null);
     }
 
     /**
@@ -92,7 +95,7 @@ class PluginInstaller extends LibraryInstaller
                 )
             );
         }
-        return $primaryNs;
+        return trim($primaryNs, '\\');
     }
 
     /**
@@ -121,6 +124,11 @@ class PluginInstaller extends LibraryInstaller
         if ($path == null) {
             unset($config['plugins'][$name]);
         } else {
+            $path = str_replace(
+                DIRECTORY_SEPARATOR . DIRECTORY_SEPARATOR,
+                DIRECTORY_SEPARATOR,
+                $path . DIRECTORY_SEPARATOR
+            );
             $config['plugins'][$name] = $path;
         }
         $this->writeConfig($configFile, $config);

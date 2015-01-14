@@ -97,7 +97,7 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase
         $autoload = array(
             'psr-4' => array(
                 'Foo\Bar' => 'bar',
-                'Foo' => ''
+                'Foo\\' => ''
             )
         );
         $this->package->setAutoload($autoload);
@@ -117,7 +117,7 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase
         $autoload = array(
             'psr-4' => array(
                 'Acme\Foo\Bar' => 'bar',
-                'Acme\Foo' => ''
+                'Acme\Foo\\' => ''
             )
         );
         $this->package->setAutoload($autoload);
@@ -142,7 +142,7 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase
         $contents = file_get_contents($this->path . '/config/plugins.php');
         $this->assertContains('<?php', $contents);
         $this->assertContains("'plugins' =>", $contents);
-        $this->assertContains("'DebugKit' => '/vendor/cakephp/DebugKit'", $contents);
+        $this->assertContains("'DebugKit' => '/vendor/cakephp/DebugKit/'", $contents);
     }
 
     public function testUpdateConfigAddPathInvalidFile()
@@ -162,7 +162,7 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase
         $contents = file_get_contents($this->path . '/config/plugins.php');
         $this->assertContains('<?php', $contents);
         $this->assertContains("'plugins' =>", $contents);
-        $this->assertContains("'DebugKit' => '/vendor/cakephp/DebugKit'", $contents);
+        $this->assertContains("'DebugKit' => '/vendor/cakephp/DebugKit/'", $contents);
         $this->assertContains("'Bake' => '/some/path'", $contents);
     }
 
