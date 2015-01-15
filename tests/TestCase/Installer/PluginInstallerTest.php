@@ -22,11 +22,19 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
+        parent::setUp();
         $this->package = new Package('CamelCased', '1.0', '1.0');
         $this->package->setType('cakephp-plugin');
 
+        $this->path = sys_get_temp_dir();
+        if (!is_dir($this->path . '/config')) {
+            mkdir($this->path . '/config');
+        }
+
         $composer = new Composer();
         $config = $this->getMock('Composer\Config');
+        $config->method('get')
+            ->will($this->returnValue($this->path . '/vendor'));
         $composer->setConfig($config);
 
         $io = $this->getMock('Composer\IO\IOInterface');
@@ -39,12 +47,21 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase
         $this->installer = new PluginInstaller($io, $composer);
     }
 
+    public function tearDown()
+    {
+        parent::tearDown();
+        if (is_file($this->path . '/config/plugins.php')) {
+            unlink($this->path . '/config/plugins.php');
+        }
+        rmdir($this->path . '/config');
+    }
+
     /**
-     * Test install path
+     * Test getting primary namespace
      *
      * @return void
      */
-    public function testGetInstallPath()
+    public function testprimaryNamespace()
     {
         $autoload = array(
             'psr-4' => array(
@@ -53,8 +70,8 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase
         );
         $this->package->setAutoload($autoload);
 
-        $path = $this->installer->getInstallPath($this->package);
-        $this->assertEquals('plugins/FOC/Authenticate', $path);
+        $ns = $this->installer->primaryNamespace($this->package);
+        $this->assertEquals('FOC\Authenticate', $ns);
 
         $autoload = array(
             'psr-4' => array(
@@ -63,8 +80,8 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase
             )
         );
         $this->package->setAutoload($autoload);
-        $path = $this->installer->getInstallPath($this->package);
-        $this->assertEquals('plugins/FOC/Acl', $path);
+        $ns = $this->installer->primaryNamespace($this->package);
+        $this->assertEquals('FOC\Acl', $ns);
 
         $autoload = array(
             'psr-4' => array(
@@ -73,8 +90,8 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase
             )
         );
         $this->package->setAutoload($autoload);
-        $path = $this->installer->getInstallPath($this->package);
-        $this->assertEquals('plugins/Acme/Plugin', $path);
+        $ns = $this->installer->primaryNamespace($this->package);
+        $this->assertEquals('Acme\Plugin', $ns);
 
         $autoload = array(
             'psr-4' => array(
@@ -83,8 +100,8 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase
             )
         );
         $this->package->setAutoload($autoload);
-        $path = $this->installer->getInstallPath($this->package);
-        $this->assertEquals('plugins/Foo', $path);
+        $ns = $this->installer->primaryNamespace($this->package);
+        $this->assertEquals('Foo', $ns);
 
         $autoload = array(
             'psr-4' => array(
@@ -93,8 +110,8 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase
             )
         );
         $this->package->setAutoload($autoload);
-        $path = $this->installer->getInstallPath($this->package);
-        $this->assertEquals('plugins/Foo', $path);
+        $ns = $this->installer->primaryNamespace($this->package);
+        $this->assertEquals('Foo', $ns);
 
         $autoload = array(
             'psr-4' => array(
@@ -103,8 +120,8 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase
             )
         );
         $this->package->setAutoload($autoload);
-        $path = $this->installer->getInstallPath($this->package);
-        $this->assertEquals('plugins/Acme/Foo', $path);
+        $ns = $this->installer->primaryNamespace($this->package);
+        $this->assertEquals('Acme\Foo', $ns);
 
         $autoload = array(
             'psr-4' => array(
@@ -113,11 +130,41 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase
             )
         );
         $this->package->setAutoload($autoload);
-        $path = $this->installer->getInstallPath($this->package);
-        $this->assertEquals('plugins/Acme/Foo', $path);
+        $ns = $this->installer->primaryNamespace($this->package);
+        $this->assertEquals('Acme\Foo', $ns);
+    }
 
-        $this->package->setExtra(array('installer-name' => 'Baz'));
-        $path = $this->installer->getInstallPath($this->package);
-        $this->assertEquals('plugins/Baz', $path);
+    /**
+     * testUpdateConfigAddPath
+     *
+     * @return void
+     */
+    public function testUpdateConfigAddPath()
+    {
+        file_put_contents($this->path . '/config/plugins.php', '<?php return ["plugins" => ["Bake" => "/some/path"]];');
+
+        $this->installer->updateConfig('DebugKit', '/vendor/cakephp/debugkit');
+        $contents = file_get_contents($this->path . '/config/plugins.php');
+        $this->assertContains('<?php', $contents);
+        $this->assertContains("'DebugKit' => '/vendor/cakephp/debugkit/'", $contents);
+        $this->assertContains("'Bake' => '/some/path'", $contents);
+    }
+
+    /**
+     * testUpdateConfigRemovePath
+     *
+     * @return void
+     */
+    public function testUpdateConfigRemovePath()
+    {
+        file_put_contents(
+            $this->path . '/config/plugins.php',
+            '<?php return ["plugins" => ["Bake" => "/some/path"]];'
+        );
+
+        $this->installer->updateConfig('Bake', null);
+        $contents = file_get_contents($this->path . '/config/plugins.php');
+        $this->assertContains('<?php', $contents);
+        $this->assertNotContains("Bake", $contents);
     }
 }
