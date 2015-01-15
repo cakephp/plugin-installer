@@ -117,7 +117,7 @@ class PluginInstaller extends LibraryInstaller
         if (!$primaryNs) {
             throw new RuntimeException(
                 sprintf(
-                    "Unable to get primary namespace for package %s. 
+                    "Unable to get primary namespace for package %s.
                     Ensure you have added proper 'autoload' section to your plugin's config as stated in README on https://github.com/cakephp/plugin-installer",
                     $package->getName()
                 )
@@ -134,6 +134,7 @@ class PluginInstaller extends LibraryInstaller
      */
     public function updateConfig($name, $path)
     {
+        $name = str_replace('\\', '/', $name);
         $root = dirname($this->vendorDir);
         $configFile = $root . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'plugins.php';
         $this->ensureConfigFile($configFile);
