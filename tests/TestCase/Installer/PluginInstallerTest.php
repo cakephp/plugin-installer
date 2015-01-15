@@ -37,14 +37,14 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($this->path . '/vendor'));
         $composer->setConfig($config);
 
-        $io = $this->getMock('Composer\IO\IOInterface');
+        $this->io = $this->getMock('Composer\IO\IOInterface');
         $rm = new RepositoryManager(
-            $io,
+            $this->io,
             $config
         );
         $composer->setRepositoryManager($rm);
 
-        $this->installer = new PluginInstaller($io, $composer);
+        $this->installer = new PluginInstaller($this->io, $composer);
     }
 
     public function tearDown()
@@ -57,11 +57,11 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Test getting primary namespace
+     * Ensure that primary namespace detection works.
      *
      * @return void
      */
-    public function testprimaryNamespace()
+    public function testPrimaryNamespace()
     {
         $autoload = array(
             'psr-4' => array(
@@ -96,7 +96,7 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase
         $autoload = array(
             'psr-4' => array(
                 'Foo\Bar' => 'bar',
-                'Foo' => ''
+                'Foo\\' => ''
             )
         );
         $this->package->setAutoload($autoload);
@@ -116,7 +116,7 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase
         $autoload = array(
             'psr-4' => array(
                 'Acme\Foo\Bar' => 'bar',
-                'Acme\Foo' => ''
+                'Acme\Foo\\' => ''
             )
         );
         $this->package->setAutoload($autoload);
@@ -130,8 +130,39 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase
             )
         );
         $this->package->setAutoload($autoload);
-        $ns = $this->installer->primaryNamespace($this->package);
-        $this->assertEquals('Acme\Foo', $ns);
+        $name = $this->installer->primaryNamespace($this->package);
+        $this->assertEquals('Acme\Foo', $name);
+    }
+
+    public function testUpdateConfigNoConfigFile()
+    {
+        $this->installer->updateConfig('DebugKit', '/vendor/cakephp/DebugKit');
+        $this->assertFileExists($this->path . '/config/plugins.php');
+        $contents = file_get_contents($this->path . '/config/plugins.php');
+        $this->assertContains('<?php', $contents);
+        $this->assertContains("'plugins' =>", $contents);
+        $this->assertContains("'DebugKit' => '/vendor/cakephp/DebugKit/'", $contents);
+    }
+
+    public function testUpdateConfigAddPathInvalidFile()
+    {
+        file_put_contents($this->path . '/config/plugins.php', '<?php $foo = "DERP";');
+
+        $this->io->expects($this->once())
+            ->method('write');
+        $this->installer->updateConfig('DebugKit', '/vendor/cakephp/DebugKit');
+    }
+
+    public function testUpdateConfigAddPathFileExists()
+    {
+        file_put_contents($this->path . '/config/plugins.php', '<?php $config = ["Bake" => "/some/path"];');
+
+        $this->installer->updateConfig('DebugKit', '/vendor/cakephp/DebugKit');
+        $contents = file_get_contents($this->path . '/config/plugins.php');
+        $this->assertContains('<?php', $contents);
+        $this->assertContains("'plugins' =>", $contents);
+        $this->assertContains("'DebugKit' => '/vendor/cakephp/DebugKit/'", $contents);
+        $this->assertContains("'Bake' => '/some/path'", $contents);
     }
 
     /**
@@ -159,12 +190,13 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase
     {
         file_put_contents(
             $this->path . '/config/plugins.php',
-            '<?php return ["plugins" => ["Bake" => "/some/path"]];'
+            '<?php $config = ["plugins" => ["Bake" => "/some/path"]];'
         );
 
-        $this->installer->updateConfig('Bake', null);
+        $this->installer->updateConfig('Bake', '');
         $contents = file_get_contents($this->path . '/config/plugins.php');
         $this->assertContains('<?php', $contents);
+        $this->assertContains("'plugins' =>", $contents);
         $this->assertNotContains("Bake", $contents);
     }
 }
