@@ -181,6 +181,7 @@ class PluginInstaller extends LibraryInstaller
         }
         $contents = <<<'PHP'
 <?php
+$baseDir = dirname(dirname(__FILE__));
 return [
     'plugins' => []
 ];
@@ -205,8 +206,8 @@ PHP;
     protected function writeConfig($path, $config)
     {
         $root = dirname($this->vendorDir);
-        $contents = '<?php' . "\n" . 'return ' . var_export($config, true) . ';';
-        $contents = str_replace($root, '', $contents);
+        $contents = '<?php' . "\n" . '$baseDir = dirname(dirname(__FILE__));' . "\n" . 'return ' . var_export($config, true) . ';';
+        $contents = str_replace('\'' . $root, '$baseDir . \'', $contents);
         file_put_contents($path, $contents);
     }
 }
