@@ -166,6 +166,22 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * testUpdateConfigAddRootPath
+     *
+     * @return void
+     */
+    public function testUpdateConfigAddRootPath() {
+        file_put_contents($this->path . '/config/plugins.php', '<?php return ["plugins" => ["Bake" => "/some/path"]];');
+
+        $this->installer->updateConfig('DebugKit', sys_get_temp_dir() . '/vendor/cakephp/debugkit');
+        $contents = file_get_contents($this->path . '/config/plugins.php');
+        $this->assertContains('<?php', $contents);
+        $this->assertContains('$baseDir = dirname(dirname(__FILE__));', $contents);
+        $this->assertContains("'DebugKit' => \$baseDir . '/vendor/cakephp/debugkit/'", $contents);
+        $this->assertContains("'Bake' => '/some/path'", $contents);
+    }
+
+    /**
      * testUpdateConfigAddPath
      *
      * @return void
