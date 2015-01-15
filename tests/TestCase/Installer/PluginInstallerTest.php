@@ -191,10 +191,13 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase
         file_put_contents($this->path . '/config/plugins.php', '<?php return ["plugins" => ["Bake" => "/some/path"]];');
 
         $this->installer->updateConfig('DebugKit', '/vendor/cakephp/debugkit');
+        $this->installer->updateConfig('ADmad\JwtAuth', '/vendor/admad/cakephp-jwt-auth');
+
         $contents = file_get_contents($this->path . '/config/plugins.php');
         $this->assertContains('<?php', $contents);
         $this->assertContains("'DebugKit' => '/vendor/cakephp/debugkit/'", $contents);
         $this->assertContains("'Bake' => '/some/path'", $contents);
+        $this->assertContains("'ADmad/JwtAuth' => '/vendor/admad/cakephp-jwt-auth/'", $contents);
     }
 
     /**
