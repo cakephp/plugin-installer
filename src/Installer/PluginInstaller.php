@@ -204,7 +204,9 @@ PHP;
      */
     protected function writeConfig($path, $config)
     {
+        $root = dirname($this->vendorDir);
         $contents = '<?php' . "\n" . 'return ' . var_export($config, true) . ';';
+        $contents = str_replace($root, '', $contents);
         file_put_contents($path, $contents);
     }
 }
