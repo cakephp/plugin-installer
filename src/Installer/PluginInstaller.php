@@ -78,20 +78,81 @@ class PluginInstaller extends LibraryInstaller
     }
 
     /**
+     * Get the primary namespace for a plugin package.
+     *
+     * @param \Composer\Package\PackageInterface $package
+     * @return string The package's primary namespace.
+     * @throws \RuntimeException When the package's primary namespace cannot be determined.
+     */
+    public function primaryNamespace($package)
+    {
+        $primaryNs = null;
+        $autoLoad = $package->getAutoload();
+        foreach ($autoLoad as $type => $pathMap) {
+            if ($type !== 'psr-4') {
+                continue;
+            }
+            $count = count($pathMap);
+
+            if ($count === 1) {
+                $primaryNs = key($pathMap);
+                break;
+            }
+
+            $matches = preg_grep('#^(\./)?src/?$#', $pathMap);
+            if ($matches) {
+                $primaryNs = key($matches);
+                break;
+            }
+
+            foreach (['', '.'] as $path) {
+                $key = array_search($path, $pathMap, true);
+                if ($key !== false) {
+                    $primaryNs = $key;
+                }
+            }
+            break;
+        }
+
+        if (!$primaryNs) {
+            throw new RuntimeException(
+                sprintf(
+                    "Unable to get primary namespace for package %s. 
+                    Ensure you have added proper 'autoload' section to your plugin's config as stated in README on https://github.com/cakephp/plugin-installer",
+                    $package->getName()
+                )
+            );
+        }
+        return trim($primaryNs, '\\');
+    }
+
+    /**
      * Update the plugin path for a given package.
      *
-     * @param string $name The plugin name.
-     * @param string|null $path The path, the plugin is being installed into or
-     *   Null to remove plugin from config.
-     * @return void
+     * @param string $name The plugin name being installed.
+     * @param string $path The path, the plugin is being installed into.
      */
     public function updateConfig($name, $path)
     {
-        $configPath = dirname($this->vendorDir) . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR;
-        $configEngine = new PhpConfig($configPath);
+        $root = dirname($this->vendorDir);
+        $configFile = $root . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'plugins.php';
+        $this->ensureConfigFile($configFile);
 
-        $config = $configEngine->read('plugins');
-        if ($path === null) {
+        $return = include $configFile;
+        if (is_array($return) && empty($config)) {
+            $config = $return;
+        }
+        if (!isset($config)) {
+            $this->io->write(
+                'ERROR - Your `config/plugins.php` did not define a $config variable. ' .
+                'Plugin path configuration not updated.'
+            );
+            return;
+        }
+        if (!isset($config['plugins'])) {
+            $config['plugins'] = [];
+        }
+        if ($path == null) {
             unset($config['plugins'][$name]);
         } else {
             $path = str_replace(
@@ -101,56 +162,49 @@ class PluginInstaller extends LibraryInstaller
             );
             $config['plugins'][$name] = $path;
         }
-        $configEngine->dump('plugins', $config);
+        $this->writeConfig($configFile, $config);
     }
 
     /**
-     * Get the primary namespace for a plugin package.
+     * Ensure that the config/plugins.php file exists.
      *
-     * @param \Composer\Package\PackageInterface $package
-     * @return string The package's primary namespace.
-     * @throws \RuntimeException When the package's primary namespace cannot be determined.
+     * @param string $path the config file path.
+     * @return void
      */
-    public function primaryNamespace($package)
+    protected function ensureConfigFile($path)
     {
-        $primaryNS = null;
-        $autoLoad = $package->getAutoload();
-        foreach ($autoLoad as $type => $pathMap) {
-            if ($type !== 'psr-4') {
-                continue;
+        if (file_exists($path)) {
+            if ($this->io->isVerbose()) {
+                $this->io->write('config/plugins.php exists.');
             }
-            $count = count($pathMap);
-
-            if ($count === 1) {
-                $primaryNS = key($pathMap);
-                break;
-            }
-
-            $matches = preg_grep('#^(\./)?src/?$#', $pathMap);
-            if ($matches) {
-                $primaryNS = key($matches);
-                break;
-            }
-
-            foreach (['', '.'] as $path) {
-                $key = array_search($path, $pathMap, true);
-                if ($key !== false) {
-                    $primaryNS = $key;
-                }
-            }
-            break;
+            return;
         }
-
-        if (!$primaryNS) {
-            throw new RuntimeException(
-                sprintf(
-                	"Unable to get primary namespace for package %s.
-                	Ensure you have added proper 'autoload' section to your plugin's config as stated in README on https://github.com/cakephp/plugin-installer",
-                	$package->getName()
-                )
-            );
+        $contents = <<<'PHP'
+<?php
+return [
+    'plugins' => []
+];
+PHP;
+        if (!is_dir(dirname($path))) {
+            mkdir(dirname($path));
         }
+        file_put_contents($path, $contents);
 
-        return trim($primaryNS, '\\');
+        if ($this->io->isVerbose()) {
+            $this->io->write('Created config/plugins.php');
+        }
+    }
+
+    /**
+     * Dump the generate configuration out to a file.
+     *
+     * @param string $path The path to write.
+     * @param array $config The config data to write.
+     * @return void
+     */
+    protected function writeConfig($path, $config)
+    {
+        $contents = '<?php' . "\n" . 'return ' . var_export($config, true) . ';';
+        file_put_contents($path, $contents);
     }
 }
