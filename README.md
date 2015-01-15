@@ -3,8 +3,8 @@ CakePHP Plugin Installer
 
 A composer installer for installing CakePHP 3.0+ plugins.
 
-This installer ensures your CakePHP plugin is installed in appropriate folder
-under your app's "plugins" folder.
+This installer ensures your application is aware of CakePHP plugins installed
+by composer in `vendor/`.
 
 Usage
 -----
