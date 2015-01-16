@@ -201,6 +201,22 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * test adding windows paths.
+     *
+     * @return void
+     */
+    public function testUpdateConfigAddPathWindows()
+    {
+        file_put_contents($this->path . '/config/plugins.php', '<?php return ["plugins" => ["Bake" => "/some/path"]];');
+
+        $this->installer->updateConfig('DebugKit', '\vendor\cakephp\debugkit');
+
+        $contents = file_get_contents($this->path . '/config/plugins.php');
+        $this->assertContains('<?php', $contents);
+        $this->assertContains("'DebugKit' => '/vendor/cakephp/debugkit/'", $contents);
+    }
+
+    /**
      * testUpdateConfigRemovePath
      *
      * @return void

@@ -159,8 +159,13 @@ class PluginInstaller extends LibraryInstaller
             $path = str_replace(
                 DIRECTORY_SEPARATOR . DIRECTORY_SEPARATOR,
                 DIRECTORY_SEPARATOR,
-                $path . DIRECTORY_SEPARATOR
+                $path
             );
+
+            // Normalize to *nix paths.
+            $path = str_replace('\\', '/', $path);
+            $path .= '/';
+
             $config['plugins'][$name] = $path;
         }
         $this->writeConfig($configFile, $config);
@@ -207,7 +212,9 @@ PHP;
     protected function writeConfig($path, $config)
     {
         $root = dirname($this->vendorDir);
-        $contents = '<?php' . "\n" . '$baseDir = dirname(dirname(__FILE__));' . "\n" . 'return ' . var_export($config, true) . ';';
+        $contents = '<?php' . "\n" .
+            '$baseDir = dirname(dirname(__FILE__));' . "\n" .
+            'return ' . var_export($config, true) . ';';
         $contents = str_replace('\'' . $root, '$baseDir . \'', $contents);
         file_put_contents($path, $contents);
     }
