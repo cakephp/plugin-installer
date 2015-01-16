@@ -33,7 +33,8 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase
 
         $composer = new Composer();
         $config = $this->getMock('Composer\Config');
-        $config->method('get')
+        $config->expects($this->any())
+            ->method('get')
             ->will($this->returnValue($this->path . '/vendor'));
         $composer->setConfig($config);
 
