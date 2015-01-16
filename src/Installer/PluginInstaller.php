@@ -214,7 +214,7 @@ PHP;
         $root = dirname($this->vendorDir);
         $contents = '<?php' . "\n" .
             '$baseDir = dirname(dirname(__FILE__));' . "\n" .
-            'return ' . var_export($config, true) . ';';
+            'return ' . var_export($config, true) . ";\n";
         $contents = str_replace('\'' . $root, '$baseDir . \'', $contents);
         file_put_contents($path, $contents);
     }
