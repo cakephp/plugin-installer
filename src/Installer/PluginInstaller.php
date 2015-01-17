@@ -212,9 +212,20 @@ PHP;
     protected function writeConfig($path, $config)
     {
         $root = dirname($this->vendorDir);
-        $contents = '<?php' . "\n" .
-            '$baseDir = dirname(dirname(__FILE__));' . "\n" .
-            'return ' . var_export($config, true) . ";\n";
+        $data = '';
+        foreach ($config['plugins'] as $name => $pluginPath) {
+            $data .= sprintf("        '%s' => '%s',\n", $name, $pluginPath);
+        }
+        $contents = <<<PHP
+<?php
+\$baseDir = dirname(dirname(__FILE__));
+return [
+    'plugins' => [
+$data
+    ]
+];
+
+PHP;
         $contents = str_replace('\'' . $root, '$baseDir . \'', $contents);
         file_put_contents($path, $contents);
     }
