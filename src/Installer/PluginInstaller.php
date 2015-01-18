@@ -1,15 +1,33 @@
 <?php
 namespace Cake\Composer\Installer;
 
-use Composer\Script\Event;
 use Cake\Core\Configure\Engine\PhpConfig;
+use Composer\Composer;
+use Composer\IO\IOInterface;
 use Composer\Installer\LibraryInstaller;
 use Composer\Package\PackageInterface;
 use Composer\Repository\InstalledRepositoryInterface;
+use Composer\Script\Event;
+use Composer\Util\Filesystem;
 use RuntimeException;
 
 class PluginInstaller extends LibraryInstaller
 {
+    protected $io;
+
+    /**
+     * Store a reference to the io for warnings
+     *
+     * @param IOInterface $io
+     * @param Composer    $composer
+     * @param string      $type
+     * @param Filesystem  $filesystem
+     */
+    public function __construct(IOInterface $io, Composer $composer, $type = 'library', Filesystem $filesystem = null)
+    {
+        $this->io = $io;
+        parent::__construct($io, $composer, $type, $filesystem);
+    }
 
     /**
      * Called whenever composer (re)generates the autoloader
@@ -189,6 +207,32 @@ PHP;
     }
 
     /**
+     * warnDeprecated
+     *
+     * @return void
+     */
+	public function warnDeprecated()
+	{
+        $emptyLine = sprintf('<error>%s</error>', str_repeat(' ', 80));
+
+        $messages = [
+            '',
+            '',
+            $emptyLine,
+            '<error>     ' . str_pad('Deprecated usage!', 75) . '</error>',
+            $emptyLine,
+            '<error>     ' . str_pad('The CakePHP installer has been changed, please update your composer', 75) . '</error>',
+            '<error>     ' . str_pad('file to remove post-install-cmd and add post-autoload-dump hook instead.', 75) . '</error>',
+            '<error>     ' . str_pad('See the changes in https://github.com/cakephp/app/pull/216 for more info.', 75) . '</error>',
+            $emptyLine,
+            '',
+            '',
+        ];
+
+        $this->io->write($messages);
+	}
+
+    /**
      * Decides if the installer supports the given type.
      *
      * This installer only supports package of type 'cakephp-plugin'.
@@ -208,9 +252,11 @@ PHP;
      *
      * @param \Composer\Repository\InstalledRepositoryInterface $repo Repository in which to check.
      * @param \Composer\Package\PackageInterface $package Package instance.
+     * @deprecated use of the post-install-cmd hook is superceeded by the post-autoload-dump hook
      */
     public function install(InstalledRepositoryInterface $repo, PackageInterface $package)
     {
+		$this->warnDeprecated();
         parent::install($repo, $package);
         $path = $this->getInstallPath($package);
         $ns = static::primaryNamespace($package);
@@ -226,11 +272,13 @@ PHP;
      * @param \Composer\Repository\InstalledRepositoryInterface $repo Repository in which to check.
      * @param \Composer\Package\PackageInterface $initial Already installed package version.
      * @param \Composer\Package\PackageInterface $target Updated version.
+     * @deprecated use of the post-install-cmd hook is superceeded by the post-autoload-dump hook
      *
      * @throws \InvalidArgumentException if $initial package is not installed
      */
     public function update(InstalledRepositoryInterface $repo, PackageInterface $initial, PackageInterface $target)
     {
+		$this->warnDeprecated();
         parent::update($repo, $initial, $target);
 
         $ns = static::primaryNamespace($initial);
@@ -246,9 +294,11 @@ PHP;
      *
      * @param \Composer\Repository\InstalledRepositoryInterface $repo Repository in which to check.
      * @param \Composer\Package\PackageInterface $package Package instance.
+     * @deprecated use of the post-install-cmd hook is superceeded by the post-autoload-dump hook
      */
     public function uninstall(InstalledRepositoryInterface $repo, PackageInterface $package)
     {
+		$this->warnDeprecated();
         parent::uninstall($repo, $package);
         $path = $this->getInstallPath($package);
         $ns = static::primaryNamespace($package);
