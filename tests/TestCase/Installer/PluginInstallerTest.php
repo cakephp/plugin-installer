@@ -20,7 +20,7 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase
      *
      * @var string
      */
-    protected $testDirs = ['config', 'plugins', 'plugins/Foo', 'plugins/Fee', 'plugins/Foe', 'plugins/Fum'];
+    protected $testDirs = ['', 'config', 'plugins', 'plugins/Foo', 'plugins/Fee', 'plugins/Foe', 'plugins/Fum'];
 
     /**
      * setUp
