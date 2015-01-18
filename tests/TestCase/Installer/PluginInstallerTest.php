@@ -16,6 +16,13 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase
     public $installer;
 
     /**
+     * Directories used during tests
+     *
+     * @var string
+     */
+    protected $testDirs = ['config', 'plugins', 'plugins/Foo', 'plugins/Fee', 'plugins/Foe', 'plugins/Fum'];
+
+    /**
      * setUp
      *
      * @return void
@@ -27,8 +34,11 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase
         $this->package->setType('cakephp-plugin');
 
         $this->path = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'plugin-installer-test';
-        if (!is_dir($this->path . '/config')) {
-            mkdir($this->path . '/config');
+
+        foreach($this->testDirs as $dir) {
+            if (!is_dir($this->path . '/' . $dir)) {
+                mkdir($this->path . '/' . $dir);
+            }
         }
 
         $composer = new Composer();
@@ -51,10 +61,17 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase
     public function tearDown()
     {
         parent::tearDown();
+        $dirs = array_reverse($this->testDirs);
+
         if (is_file($this->path . '/config/plugins.php')) {
             unlink($this->path . '/config/plugins.php');
         }
-        rmdir($this->path . '/config');
+
+        foreach($dirs as $dir) {
+            if (is_dir($this->path . '/' . $dir)) {
+                rmdir($this->path . '/' . $dir);
+            }
+        }
     }
 
     /**
@@ -147,6 +164,108 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase
         $this->package->setAutoload($autoload);
         $name = PluginInstaller::primaryNamespace($this->package);
         $this->assertEquals('Acme\Foo', $name);
+    }
+
+    public function testDeterminePlugins()
+    {
+        $plugin1 = new Package('cakephp/the-thing', '1.0', '1.0');
+        $plugin1->setType('cakephp-plugin');
+        $plugin1->setAutoload([
+            'psr-4' => [
+                'TheThing' => 'src/'
+            ]
+        ]);
+
+        $plugin2 = new Package('cakephp/princess', '1.0', '1.0');
+        $plugin2->setType('cakephp-plugin');
+        $plugin2->setAutoload([
+            'psr-4' => [
+                'Princess' => 'src/'
+            ]
+        ]);
+
+        $packages = [
+            $plugin1,
+            new Package('SomethingElse', '1.0', '1.0'),
+            $plugin2
+        ];
+
+        $return = PluginInstaller::determinePlugins(
+            $packages,
+            $this->path . '/doesnt-exist',
+            $this->path . '/vendors'
+        );
+
+        $expected = [
+            'Princess' => $this->path . '/vendors/cakephp/princess',
+            'TheThing' => $this->path . '/vendors/cakephp/the-thing'
+        ];
+        $this->assertSame($expected, $return, 'Only composer-loaded plugins should be listed');
+
+        $return = PluginInstaller::determinePlugins(
+            $packages,
+            $this->path . '/plugins',
+            $this->path . '/vendors'
+        );
+
+        $expected = [
+            'Fee' => $this->path . '/plugins/Fee',
+            'Foe' => $this->path . '/plugins/Foe',
+            'Foo' => $this->path . '/plugins/Foo',
+            'Fum' => $this->path . '/plugins/Fum',
+            'Princess' => $this->path . '/vendors/cakephp/princess',
+            'TheThing' => $this->path . '/vendors/cakephp/the-thing'
+        ];
+        $this->assertSame($expected, $return, 'Composer and application plugins should be listed');
+    }
+
+    public function testWriteConfigFile()
+    {
+        $plugins = [
+            'Fee' => $this->path . '/plugins/Fee',
+            'Foe' => $this->path . '/plugins/Foe',
+            'Foo' => $this->path . '/plugins/Foo',
+            'Fum' => $this->path . '/plugins/Fum',
+            'OddOneOut' => '/some/other/path',
+            'Princess' => $this->path . '/vendors/cakephp/princess',
+            'TheThing' => $this->path . '/vendors/cakephp/the-thing'
+        ];
+
+        $path = $this->path . '/config/plugins.php';
+        PluginInstaller::writeConfigFile($path, $plugins);
+
+        $this->assertFileExists($path);
+        $contents = file_get_contents($path);
+
+        $this->assertContains('<?php', $contents);
+        $this->assertContains('$baseDir = dirname(dirname(__FILE__));', $contents);
+        $this->assertContains(
+            "'Fee' => \$baseDir . '/plugins/Fee/'",
+            $contents,
+            'paths should be relative for app-plugins'
+        );
+        $this->assertContains(
+            "'Princess' => \$baseDir . '/vendors/cakephp/princess/'",
+            $contents,
+            'paths should be relative for vendor-plugins'
+        );
+        $this->assertContains(
+            "'OddOneOut' => '/some/other/path/'",
+            $contents,
+            'paths should stay absolute if it\'s not under the application root'
+        );
+
+        // Ensure all plugin paths are slash terminated
+        foreach($plugins as &$plugin) {
+            $plugin .= '/';
+        }
+        unset ($plugin);
+
+        $result = require($path);
+        $expected = [
+            'plugins' => $plugins
+        ];
+        $this->assertSame($expected, $result, 'The evaluated result should be the same as the input');
     }
 
     public function testUpdateConfigNoConfigFile()

@@ -34,7 +34,7 @@ class PluginInstaller extends LibraryInstaller
         $plugins = static::determinePlugins($packages, $pluginsDir, $vendorsDir);
 
         $configFile = static::configFile($root);
-        static::overwriteConfigFile($configFile, $plugins);
+        static::writeConfigFile($configFile, $plugins);
     }
 
     /**
@@ -48,7 +48,7 @@ class PluginInstaller extends LibraryInstaller
      * @param string $vendorsDir the path to the vendors dir
      * @return array plugin-name indexed paths to plugins
      */
-    public static function determinePlugins($packages, $pluginsDir, $vendorsDir)
+    public static function determinePlugins($packages, $pluginsDir = 'plugins', $vendorsDir = 'vendors')
     {
         $plugins = [];
 
@@ -62,14 +62,16 @@ class PluginInstaller extends LibraryInstaller
             $plugins[$ns] = $path;
         }
 
-        $dir = new \DirectoryIterator($pluginsDir);
-        foreach($dir as $info) {
-            if (!$info->isDir() || $info->isDot()) {
-                continue;
-            }
+        if (is_dir($pluginsDir)) {
+            $dir = new \DirectoryIterator($pluginsDir);
+            foreach($dir as $info) {
+                if (!$info->isDir() || $info->isDot()) {
+                    continue;
+                }
 
-            $name = $info->getFilename();
-            $plugins[$name] = $pluginsDir . DIRECTORY_SEPARATOR . $name;
+                $name = $info->getFilename();
+                $plugins[$name] = $pluginsDir . DIRECTORY_SEPARATOR . $name;
+            }
         }
 
         ksort($plugins);
@@ -83,7 +85,7 @@ class PluginInstaller extends LibraryInstaller
      * @param array $plugins
      * @return void
      */
-    public static function overwriteConfigFile($configFile, $plugins)
+    public static function writeConfigFile($configFile, $plugins)
     {
         $root = dirname(dirname($configFile));
 
