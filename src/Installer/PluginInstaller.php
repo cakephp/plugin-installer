@@ -12,7 +12,10 @@ class PluginInstaller extends LibraryInstaller
 {
 
     /**
-     * postAutoloadDump
+     * Called whenever composer (re)generates the autoloader
+     *
+     * Recreates CakePHP's plugin path map, based on composer information
+     * and available app-plugins.
      *
      * @param Event $event
      * @return void
@@ -20,13 +23,33 @@ class PluginInstaller extends LibraryInstaller
     public static function postAutoloadDump(Event $event)
     {
         $composer = $event->getComposer();
-
         $config = $composer->getConfig();
+
         $vendorsDir = $config->get('vendor-dir');
-        $configFile = static::configFile(dirname($vendorsDir));
+        $root = dirname($vendorsDir);
 
         $packages = $composer->getRepositoryManager()->getLocalRepository()->getPackages();
+        $pluginsDir = $root . DIRECTORY_SEPARATOR . 'plugins';
 
+        $plugins = static::determinePlugins($packages, $pluginsDir, $vendorsDir);
+
+        $configFile = static::configFile($root);
+        static::overwriteConfigFile($configFile, $plugins);
+    }
+
+    /**
+     * Find all plugins available
+     *
+     * Add all composer packages of type cakephp-plugin, and all plugins located
+     * in the plugins directory to a plugin-name indexed array of paths
+     *
+     * @param array $packages an array of \Composer\Package\PackageInterface objects
+     * @param string $pluginsDir the path to the plugins dir
+     * @param string $vendorsDir the path to the vendors dir
+     * @return array plugin-name indexed paths to plugins
+     */
+    public static function determinePlugins($packages, $pluginsDir, $vendorsDir)
+    {
         $plugins = [];
 
         foreach($packages as $package) {
@@ -39,9 +62,8 @@ class PluginInstaller extends LibraryInstaller
             $plugins[$ns] = $path;
         }
 
-        $pluginsDir = dirname($vendorsDir) . DIRECTORY_SEPARATOR . 'plugins';
         $dir = new \DirectoryIterator($pluginsDir);
-        foreach ($dir as $info) {
+        foreach($dir as $info) {
             if (!$info->isDir() || $info->isDot()) {
                 continue;
             }
@@ -50,7 +72,8 @@ class PluginInstaller extends LibraryInstaller
             $plugins[$name] = $pluginsDir . DIRECTORY_SEPARATOR . $name;
         }
 
-        static::overwriteConfigFile( $configFile, $plugins);
+        ksort($plugins);
+        return $plugins;
     }
 
     /**
