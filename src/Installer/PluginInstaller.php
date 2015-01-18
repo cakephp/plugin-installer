@@ -91,6 +91,15 @@ $data
 ];
 
 PHP;
+
+        $root = str_replace(
+            DIRECTORY_SEPARATOR . DIRECTORY_SEPARATOR,
+            DIRECTORY_SEPARATOR,
+            $root
+        );
+
+        // Normalize to *nix paths.
+        $root = str_replace('\\', '/', $root);
         $contents = str_replace('\'' . $root, '$baseDir . \'', $contents);
         file_put_contents($configFile, $contents);
     }
