@@ -1,6 +1,7 @@
 <?php
 namespace Cake\Composer\Installer;
 
+use Composer\Script\Event;
 use Cake\Core\Configure\Engine\PhpConfig;
 use Composer\Installer\LibraryInstaller;
 use Composer\Package\PackageInterface;
@@ -11,70 +12,97 @@ class PluginInstaller extends LibraryInstaller
 {
 
     /**
-     * Decides if the installer supports the given type.
+     * postAutoloadDump
      *
-     * This installer only supports package of type 'cakephp-plugin'.
-     *
-     * @return bool
+     * @param Event $event
+     * @return void
      */
-    public function supports($packageType)
+    public static function postAutoloadDump(Event $event)
     {
-        return 'cakephp-plugin' === $packageType;
+        $composer = $event->getComposer();
+
+        $config = $composer->getConfig();
+        $vendorsDir = $config->get('vendor-dir');
+        $configFile = static::configFile(dirname($vendorsDir));
+
+        $packages = $composer->getRepositoryManager()->getLocalRepository()->getPackages();
+
+        $plugins = [];
+
+        foreach($packages as $package) {
+            if ($package->getType() !== 'cakephp-plugin') {
+                continue;
+            }
+
+            $ns = static::primaryNamespace($package);
+            $path = $vendorsDir . DIRECTORY_SEPARATOR . $package->getPrettyName();
+            $plugins[$ns] = $path;
+        }
+
+        $pluginsDir = dirname($vendorsDir) . DIRECTORY_SEPARATOR . 'plugins';
+        $dir = new \DirectoryIterator($pluginsDir);
+        foreach ($dir as $info) {
+            if (!$info->isDir() || $info->isDot()) {
+                continue;
+            }
+
+            $name = $info->getFilename();
+            $plugins[$name] = $pluginsDir . DIRECTORY_SEPARATOR . $name;
+        }
+
+        static::overwriteConfigFile( $configFile, $plugins);
     }
 
     /**
-     * Installs specific plugin.
+     * Rewrite the config file with a complete list of plugins
      *
-     * After the plugin is installed, app's `plugins.php` config file is updated with
-     * plugin namespace to path mapping.
-     *
-     * @param \Composer\Repository\InstalledRepositoryInterface $repo Repository in which to check.
-     * @param \Composer\Package\PackageInterface $package Package instance.
+     * @param string $configFile
+     * @param array $plugins
+     * @return void
      */
-    public function install(InstalledRepositoryInterface $repo, PackageInterface $package)
+    public static function overwriteConfigFile($configFile, $plugins)
     {
-        parent::install($repo, $package);
-        $path = $this->getInstallPath($package);
-        $ns = $this->primaryNamespace($package);
-        $this->updateConfig($ns, $path);
+        $root = dirname(dirname($configFile));
+
+        $data = [];
+        foreach ($plugins as $name => $pluginPath) {
+            $pluginPath = str_replace(
+                DIRECTORY_SEPARATOR . DIRECTORY_SEPARATOR,
+                DIRECTORY_SEPARATOR,
+                $pluginPath
+            );
+
+            // Normalize to *nix paths.
+            $pluginPath = str_replace('\\', '/', $pluginPath);
+            $pluginPath .= '/';
+
+            $data[] = sprintf("        '%s' => '%s'", $name, $pluginPath);
+        }
+
+        $data = implode(",\n", $data);
+
+        $contents = <<<PHP
+<?php
+\$baseDir = dirname(dirname(__FILE__));
+return [
+    'plugins' => [
+$data
+    ]
+];
+
+PHP;
+        $contents = str_replace('\'' . $root, '$baseDir . \'', $contents);
+        file_put_contents($configFile, $contents);
     }
 
     /**
-     * Updates specific plugin.
+     * Path to the plugin config file
      *
-     * After the plugin is installed, app's `plugins.php` config file is updated with
-     * plugin namespace to path mapping.
-     *
-     * @param \Composer\Repository\InstalledRepositoryInterface $repo Repository in which to check.
-     * @param \Composer\Package\PackageInterface $initial Already installed package version.
-     * @param \Composer\Package\PackageInterface $target Updated version.
-     *
-     * @throws \InvalidArgumentException if $initial package is not installed
+     * @return string absolute file path
      */
-    public function update(InstalledRepositoryInterface $repo, PackageInterface $initial, PackageInterface $target)
+    protected static function configFile($root)
     {
-        parent::update($repo, $initial, $target);
-
-        $ns = $this->primaryNamespace($initial);
-        $this->updateConfig($ns, null);
-
-        $path = $this->getInstallPath($target);
-        $ns = $this->primaryNamespace($target);
-        $this->updateConfig($ns, $path);
-    }
-
-    /**
-     * Uninstalls specific package.
-     *
-     * @param \Composer\Repository\InstalledRepositoryInterface $repo Repository in which to check.
-     * @param \Composer\Package\PackageInterface $package Package instance.
-     */
-    public function uninstall(InstalledRepositoryInterface $repo, PackageInterface $package)
-    {
-        parent::uninstall($repo, $package);
-        $path = $this->getInstallPath($package);
-        $ns = $this->primaryNamespace($package);
-        $this->updateConfig($ns, null);
+        return $root . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'plugins.php';
     }
 
     /**
@@ -84,7 +112,7 @@ class PluginInstaller extends LibraryInstaller
      * @return string The package's primary namespace.
      * @throws \RuntimeException When the package's primary namespace cannot be determined.
      */
-    public function primaryNamespace($package)
+    public static function primaryNamespace($package)
     {
         $primaryNs = null;
         $autoLoad = $package->getAutoload();
@@ -127,6 +155,73 @@ class PluginInstaller extends LibraryInstaller
     }
 
     /**
+     * Decides if the installer supports the given type.
+     *
+     * This installer only supports package of type 'cakephp-plugin'.
+     *
+     * @return bool
+     */
+    public function supports($packageType)
+    {
+        return 'cakephp-plugin' === $packageType;
+    }
+
+    /**
+     * Installs specific plugin.
+     *
+     * After the plugin is installed, app's `plugins.php` config file is updated with
+     * plugin namespace to path mapping.
+     *
+     * @param \Composer\Repository\InstalledRepositoryInterface $repo Repository in which to check.
+     * @param \Composer\Package\PackageInterface $package Package instance.
+     */
+    public function install(InstalledRepositoryInterface $repo, PackageInterface $package)
+    {
+        parent::install($repo, $package);
+        $path = $this->getInstallPath($package);
+        $ns = static::primaryNamespace($package);
+        $this->updateConfig($ns, $path);
+    }
+
+    /**
+     * Updates specific plugin.
+     *
+     * After the plugin is installed, app's `plugins.php` config file is updated with
+     * plugin namespace to path mapping.
+     *
+     * @param \Composer\Repository\InstalledRepositoryInterface $repo Repository in which to check.
+     * @param \Composer\Package\PackageInterface $initial Already installed package version.
+     * @param \Composer\Package\PackageInterface $target Updated version.
+     *
+     * @throws \InvalidArgumentException if $initial package is not installed
+     */
+    public function update(InstalledRepositoryInterface $repo, PackageInterface $initial, PackageInterface $target)
+    {
+        parent::update($repo, $initial, $target);
+
+        $ns = static::primaryNamespace($initial);
+        $this->updateConfig($ns, null);
+
+        $path = $this->getInstallPath($target);
+        $ns = static::primaryNamespace($target);
+        $this->updateConfig($ns, $path);
+    }
+
+    /**
+     * Uninstalls specific package.
+     *
+     * @param \Composer\Repository\InstalledRepositoryInterface $repo Repository in which to check.
+     * @param \Composer\Package\PackageInterface $package Package instance.
+     */
+    public function uninstall(InstalledRepositoryInterface $repo, PackageInterface $package)
+    {
+        parent::uninstall($repo, $package);
+        $path = $this->getInstallPath($package);
+        $ns = static::primaryNamespace($package);
+        $this->updateConfig($ns, null);
+    }
+
+    /**
      * Update the plugin path for a given package.
      *
      * @param string $name The plugin name being installed.
@@ -135,8 +230,7 @@ class PluginInstaller extends LibraryInstaller
     public function updateConfig($name, $path)
     {
         $name = str_replace('\\', '/', $name);
-        $root = dirname($this->vendorDir);
-        $configFile = $root . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'plugins.php';
+        $configFile = static::configFile(dirname($this->vendorDir));
         $this->ensureConfigFile($configFile);
 
         $return = include $configFile;
