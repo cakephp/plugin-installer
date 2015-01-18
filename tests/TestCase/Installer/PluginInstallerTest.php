@@ -1,7 +1,7 @@
 <?php
 namespace Cake\Test\TestCase\Composer\Installer;
 
-use Cake\Composer\Installer\PluginInstaller;
+use Cake\Test\Composer\Installer\PluginInstaller;
 use Composer\Composer;
 use Composer\Config;
 use Composer\Package\Package;
@@ -26,7 +26,7 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase
         $this->package = new Package('CamelCased', '1.0', '1.0');
         $this->package->setType('cakephp-plugin');
 
-        $this->path = sys_get_temp_dir();
+        $this->path = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'plugin-installer-test';
         if (!is_dir($this->path . '/config')) {
             mkdir($this->path . '/config');
         }
@@ -58,6 +58,20 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Sanity test
+     *
+     * The test double should return a path to a test file, where
+     * the containing folder
+     *
+     * @return void
+     */
+    public function testConfigFile()
+    {
+        $path = PluginInstaller::configFile("");
+        $this->assertFileExists(dirname($path));
+    }
+
+    /**
      * Ensure that primary namespace detection works.
      *
      * @return void
@@ -71,7 +85,7 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase
         );
         $this->package->setAutoload($autoload);
 
-        $ns = $this->installer->primaryNamespace($this->package);
+        $ns = PluginInstaller::primaryNamespace($this->package);
         $this->assertEquals('FOC\Authenticate', $ns);
 
         $autoload = array(
@@ -81,7 +95,7 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase
             )
         );
         $this->package->setAutoload($autoload);
-        $ns = $this->installer->primaryNamespace($this->package);
+        $ns = PluginInstaller::primaryNamespace($this->package);
         $this->assertEquals('FOC\Acl', $ns);
 
         $autoload = array(
@@ -91,7 +105,7 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase
             )
         );
         $this->package->setAutoload($autoload);
-        $ns = $this->installer->primaryNamespace($this->package);
+        $ns = PluginInstaller::primaryNamespace($this->package);
         $this->assertEquals('Acme\Plugin', $ns);
 
         $autoload = array(
@@ -101,7 +115,7 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase
             )
         );
         $this->package->setAutoload($autoload);
-        $ns = $this->installer->primaryNamespace($this->package);
+        $ns = PluginInstaller::primaryNamespace($this->package);
         $this->assertEquals('Foo', $ns);
 
         $autoload = array(
@@ -111,7 +125,7 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase
             )
         );
         $this->package->setAutoload($autoload);
-        $ns = $this->installer->primaryNamespace($this->package);
+        $ns = PluginInstaller::primaryNamespace($this->package);
         $this->assertEquals('Foo', $ns);
 
         $autoload = array(
@@ -121,7 +135,7 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase
             )
         );
         $this->package->setAutoload($autoload);
-        $ns = $this->installer->primaryNamespace($this->package);
+        $ns = PluginInstaller::primaryNamespace($this->package);
         $this->assertEquals('Acme\Foo', $ns);
 
         $autoload = array(
@@ -131,7 +145,7 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase
             )
         );
         $this->package->setAutoload($autoload);
-        $name = $this->installer->primaryNamespace($this->package);
+        $name = PluginInstaller::primaryNamespace($this->package);
         $this->assertEquals('Acme\Foo', $name);
     }
 
@@ -177,7 +191,7 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase
     public function testUpdateConfigAddRootPath() {
         file_put_contents($this->path . '/config/plugins.php', '<?php return ["plugins" => ["Bake" => "/some/path"]];');
 
-        $this->installer->updateConfig('DebugKit', sys_get_temp_dir() . '/vendor/cakephp/debugkit');
+        $this->installer->updateConfig('DebugKit', $this->path . '/vendor/cakephp/debugkit');
         $contents = file_get_contents($this->path . '/config/plugins.php');
         $this->assertContains('<?php', $contents);
         $this->assertContains('$baseDir = dirname(dirname(__FILE__));', $contents);
