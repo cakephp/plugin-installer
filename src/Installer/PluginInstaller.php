@@ -13,6 +13,19 @@ use RuntimeException;
 
 class PluginInstaller extends LibraryInstaller
 {
+    /**
+     * A flag to check usage - once
+     *
+     * @var bool
+     * @access public
+     */
+    static $checkUsage = true;
+
+    /**
+     * io instance
+     *
+     * @var \Composer\IO\IOInterface
+     */
     protected $io;
 
     /**
@@ -25,8 +38,66 @@ class PluginInstaller extends LibraryInstaller
      */
     public function __construct(IOInterface $io, Composer $composer, $type = 'library', Filesystem $filesystem = null)
     {
-        $this->io = $io;
         parent::__construct($io, $composer, $type, $filesystem);
+        $this->io = $io;
+        $this->checkUsage($composer);
+    }
+
+    /**
+     * Check that the root composer.json file use the post-autoload-dump hook
+     *
+     * If not, warn the user they need to update their application's composer file.
+     * Do nothing if the main project is not a project (if it's a plugin in development).
+     *
+     * @param Composer $composer
+     * @return void
+     */
+    public function checkUsage(Composer $composer) {
+        if (static::$checkUsage === false) {
+            return;
+        }
+        static::$checkUsage = false;
+
+        $root = $composer->getPackage();
+
+        if ($root->getType() !== 'project') {
+            return;
+        }
+
+        $scripts = $composer->getPackage()->getScripts();
+        $postAutoloadDump = 'Cake\Composer\Installer\PluginInstaller::postAutoloadDump';
+        if (
+            !isset($scripts['post-autoload-dump']) ||
+            !in_array($postAutoloadDump, $scripts['post-autoload-dump'])
+        ) {
+            $this->warnUpdateRequired();
+        }
+    }
+
+    /**
+     * Warn the developer they need to update their root comopser.json file
+     *
+     * @return void
+     */
+    public function warnUpdateRequired()
+    {
+        $emptyLine = sprintf('<error>%s</error>', str_repeat(' ', 80));
+
+        $messages = [
+            '',
+            '',
+            $emptyLine,
+            '<error>     ' . str_pad('Action required!', 75) . '</error>',
+            $emptyLine,
+            '<error>     ' . str_pad('The CakePHP plugin installer has been changed, please update your', 75) . '</error>',
+            '<error>     ' . str_pad('application composer.json file to add the post-autoload-dump hook.', 75) . '</error>',
+            '<error>     ' . str_pad('See the changes in https://github.com/cakephp/app/pull/216 for more info.', 75) . '</error>',
+            $emptyLine,
+            '',
+            '',
+        ];
+
+        $this->io->write($messages);
     }
 
     /**
@@ -207,32 +278,6 @@ PHP;
     }
 
     /**
-     * warnDeprecated
-     *
-     * @return void
-     */
-	public function warnDeprecated()
-	{
-        $emptyLine = sprintf('<error>%s</error>', str_repeat(' ', 80));
-
-        $messages = [
-            '',
-            '',
-            $emptyLine,
-            '<error>     ' . str_pad('Deprecated usage!', 75) . '</error>',
-            $emptyLine,
-            '<error>     ' . str_pad('The CakePHP installer has been changed, please update your composer', 75) . '</error>',
-            '<error>     ' . str_pad('file to remove post-install-cmd and add post-autoload-dump hook instead.', 75) . '</error>',
-            '<error>     ' . str_pad('See the changes in https://github.com/cakephp/app/pull/216 for more info.', 75) . '</error>',
-            $emptyLine,
-            '',
-            '',
-        ];
-
-        $this->io->write($messages);
-	}
-
-    /**
      * Decides if the installer supports the given type.
      *
      * This installer only supports package of type 'cakephp-plugin'.
@@ -256,7 +301,6 @@ PHP;
      */
     public function install(InstalledRepositoryInterface $repo, PackageInterface $package)
     {
-		$this->warnDeprecated();
         parent::install($repo, $package);
         $path = $this->getInstallPath($package);
         $ns = static::primaryNamespace($package);
@@ -278,7 +322,6 @@ PHP;
      */
     public function update(InstalledRepositoryInterface $repo, PackageInterface $initial, PackageInterface $target)
     {
-		$this->warnDeprecated();
         parent::update($repo, $initial, $target);
 
         $ns = static::primaryNamespace($initial);
@@ -298,7 +341,6 @@ PHP;
      */
     public function uninstall(InstalledRepositoryInterface $repo, PackageInterface $package)
     {
-		$this->warnDeprecated();
         parent::uninstall($repo, $package);
         $path = $this->getInstallPath($package);
         $ns = static::primaryNamespace($package);
