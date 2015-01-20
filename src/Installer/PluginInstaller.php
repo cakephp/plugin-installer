@@ -361,7 +361,7 @@ PHP;
         }
         if (!isset($config)) {
             $this->io->write(
-                'ERROR - Your `vendor/cakephp-plugins.php` did not define a $config variable. ' .
+                'ERROR - `vendor/cakephp-plugins.php` file is invalid. ' .
                 'Plugin path configuration not updated.'
             );
             return;
