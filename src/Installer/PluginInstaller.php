@@ -75,7 +75,7 @@ class PluginInstaller extends LibraryInstaller
     }
 
     /**
-     * Warn the developer they need to update their root comopser.json file
+     * Warn the developer they need to update their root composer.json file
      *
      * @return void
      */
