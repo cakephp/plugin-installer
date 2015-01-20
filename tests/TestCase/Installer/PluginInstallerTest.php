@@ -193,19 +193,19 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase
         $return = PluginInstaller::determinePlugins(
             $packages,
             $this->path . '/doesnt-exist',
-            $this->path . '/vendors'
+            $this->path . '/vendor'
         );
 
         $expected = [
-            'Princess' => $this->path . '/vendors/cakephp/princess',
-            'TheThing' => $this->path . '/vendors/cakephp/the-thing'
+            'Princess' => $this->path . '/vendor/cakephp/princess',
+            'TheThing' => $this->path . '/vendor/cakephp/the-thing'
         ];
         $this->assertSame($expected, $return, 'Only composer-loaded plugins should be listed');
 
         $return = PluginInstaller::determinePlugins(
             $packages,
             $this->path . '/plugins',
-            $this->path . '/vendors'
+            $this->path . '/vendor'
         );
 
         $expected = [
@@ -213,8 +213,8 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase
             'Foe' => $this->path . '/plugins/Foe',
             'Foo' => $this->path . '/plugins/Foo',
             'Fum' => $this->path . '/plugins/Fum',
-            'Princess' => $this->path . '/vendors/cakephp/princess',
-            'TheThing' => $this->path . '/vendors/cakephp/the-thing'
+            'Princess' => $this->path . '/vendor/cakephp/princess',
+            'TheThing' => $this->path . '/vendor/cakephp/the-thing'
         ];
         $this->assertSame($expected, $return, 'Composer and application plugins should be listed');
     }
@@ -227,8 +227,8 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase
             'Foo' => $this->path . '/plugins/Foo',
             'Fum' => $this->path . '/plugins/Fum',
             'OddOneOut' => '/some/other/path',
-            'Princess' => $this->path . '/vendors/cakephp/princess',
-            'TheThing' => $this->path . '/vendors/cakephp/the-thing'
+            'Princess' => $this->path . '/vendor/cakephp/princess',
+            'TheThing' => $this->path . '/vendor/cakephp/the-thing'
         ];
 
         $path = $this->path . '/vendor/cakephp-plugins.php';
@@ -245,7 +245,7 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase
             'paths should be relative for app-plugins'
         );
         $this->assertContains(
-            "'Princess' => \$baseDir . '/vendors/cakephp/princess/'",
+            "'Princess' => \$baseDir . '/vendor/cakephp/princess/'",
             $contents,
             'paths should be relative for vendor-plugins'
         );

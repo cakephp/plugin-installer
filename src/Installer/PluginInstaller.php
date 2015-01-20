@@ -109,13 +109,13 @@ class PluginInstaller extends LibraryInstaller
         $composer = $event->getComposer();
         $config = $composer->getConfig();
 
-        $vendorsDir = $config->get('vendor-dir');
-        $root = dirname($vendorsDir);
+        $vendorDir = $config->get('vendor-dir');
+        $root = dirname($vendorDir);
 
         $packages = $composer->getRepositoryManager()->getLocalRepository()->getPackages();
         $pluginsDir = $root . DIRECTORY_SEPARATOR . 'plugins';
 
-        $plugins = static::determinePlugins($packages, $pluginsDir, $vendorsDir);
+        $plugins = static::determinePlugins($packages, $pluginsDir, $vendorDir);
 
         $configFile = static::_configFile($root);
         static::writeConfigFile($configFile, $plugins);
@@ -129,10 +129,10 @@ class PluginInstaller extends LibraryInstaller
      *
      * @param array $packages an array of \Composer\Package\PackageInterface objects
      * @param string $pluginsDir the path to the plugins dir
-     * @param string $vendorsDir the path to the vendors dir
+     * @param string $vendorDir the path to the vendor dir
      * @return array plugin-name indexed paths to plugins
      */
-    public static function determinePlugins($packages, $pluginsDir = 'plugins', $vendorsDir = 'vendors')
+    public static function determinePlugins($packages, $pluginsDir = 'plugins', $vendorDir = 'vendor')
     {
         $plugins = [];
 
@@ -142,7 +142,7 @@ class PluginInstaller extends LibraryInstaller
             }
 
             $ns = static::primaryNamespace($package);
-            $path = $vendorsDir . DIRECTORY_SEPARATOR . $package->getPrettyName();
+            $path = $vendorDir . DIRECTORY_SEPARATOR . $package->getPrettyName();
             $plugins[$ns] = $path;
         }
 
@@ -390,7 +390,7 @@ PHP;
     /**
      * Ensure that the vendor/cakephp-plugins.php file exists.
      *
-     * If config/plugins.php is found - copy it to the vendors folder
+     * If config/plugins.php is found - copy it to the vendor folder
      *
      * @param string $path the config file path.
      * @return void
