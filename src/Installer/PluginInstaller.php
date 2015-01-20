@@ -3,8 +3,8 @@ namespace Cake\Composer\Installer;
 
 use Cake\Core\Configure\Engine\PhpConfig;
 use Composer\Composer;
-use Composer\IO\IOInterface;
 use Composer\Installer\LibraryInstaller;
+use Composer\IO\IOInterface;
 use Composer\Package\PackageInterface;
 use Composer\Repository\InstalledRepositoryInterface;
 use Composer\Script\Event;
@@ -40,7 +40,7 @@ class PluginInstaller extends LibraryInstaller
      * If not, warn the user they need to update their application's composer file.
      * Do nothing if the main project is not a project (if it's a plugin in development).
      *
-     * @param Composer $composer
+     * @param Composer $composer object
      * @return void
      */
     public function checkUsage(Composer $composer)
