@@ -309,7 +309,10 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase
      */
     public function testUpdateConfigAddRootPath()
     {
-        file_put_contents($this->path . '/vendor/cakephp-plugins.php', '<?php return ["plugins" => ["Bake" => "/some/path"]];');
+        file_put_contents(
+            $this->path . '/vendor/cakephp-plugins.php',
+            '<?php return ["plugins" => ["Bake" => "/some/path"]];'
+        );
 
         $this->installer->updateConfig('DebugKit', $this->path . '/vendor/cakephp/debugkit');
         $contents = file_get_contents($this->path . '/vendor/cakephp-plugins.php');
@@ -326,7 +329,10 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase
      */
     public function testUpdateConfigAddPath()
     {
-        file_put_contents($this->path . '/vendor/cakephp-plugins.php', '<?php return ["plugins" => ["Bake" => "/some/path"]];');
+        file_put_contents(
+            $this->path . '/vendor/cakephp-plugins.php',
+            '<?php return ["plugins" => ["Bake" => "/some/path"]];'
+        );
 
         $this->installer->updateConfig('DebugKit', '/vendor/cakephp/debugkit');
         $this->installer->updateConfig('ADmad\JwtAuth', '/vendor/admad/cakephp-jwt-auth');
@@ -345,7 +351,10 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase
      */
     public function testUpdateConfigAddPathWindows()
     {
-        file_put_contents($this->path . '/vendor/cakephp-plugins.php', '<?php return ["plugins" => ["Bake" => "/some/path"]];');
+        file_put_contents(
+            $this->path . '/vendor/cakephp-plugins.php',
+            '<?php return ["plugins" => ["Bake" => "/some/path"]];'
+        );
 
         $this->installer->updateConfig('DebugKit', '\vendor\cakephp\debugkit');
 
