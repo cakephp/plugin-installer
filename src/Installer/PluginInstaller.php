@@ -1,7 +1,6 @@
 <?php
 namespace Cake\Composer\Installer;
 
-use Cake\Core\Configure\Engine\PhpConfig;
 use Composer\Composer;
 use Composer\Installer\LibraryInstaller;
 use Composer\IO\IOInterface;
@@ -117,7 +116,7 @@ class PluginInstaller extends LibraryInstaller
 
         $plugins = static::determinePlugins($packages, $pluginsDir, $vendorDir);
 
-        $configFile = static::_configFile($root);
+        $configFile = static::_configFile($vendorDir);
         static::writeConfigFile($configFile, $plugins);
     }
 
@@ -218,9 +217,9 @@ PHP;
      *
      * @return string absolute file path
      */
-    protected static function _configFile($root)
+    protected static function _configFile($vendorDir)
     {
-        return $root . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'cakephp-plugins.php';
+        return $vendorDir . DIRECTORY_SEPARATOR . 'cakephp-plugins.php';
     }
 
     /**
@@ -352,7 +351,7 @@ PHP;
     public function updateConfig($name, $path)
     {
         $name = str_replace('\\', '/', $name);
-        $configFile = static::_configFile(dirname($this->vendorDir));
+        $configFile = static::_configFile($this->vendorDir);
         $this->_ensureConfigFile($configFile);
 
         $return = include $configFile;
