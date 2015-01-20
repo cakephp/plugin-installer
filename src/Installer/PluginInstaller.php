@@ -263,8 +263,9 @@ PHP;
         if (!$primaryNs) {
             throw new RuntimeException(
                 sprintf(
-                    "Unable to get primary namespace for package %s.
-                    Ensure you have added proper 'autoload' section to your plugin's config as stated in README on https://github.com/cakephp/plugin-installer",
+                    "Unable to get primary namespace for package %s." .
+                    "\nEnsure you have added proper 'autoload' section to your plugin's config" .
+                    " as stated in README on https://github.com/cakephp/plugin-installer",
                     $package->getName()
                 )
             );
