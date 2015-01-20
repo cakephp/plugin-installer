@@ -61,16 +61,25 @@ class PluginInstaller extends LibraryInstaller
             !isset($scripts['post-autoload-dump']) ||
             !in_array($postAutoloadDump, $scripts['post-autoload-dump'])
         ) {
-            $this->warnUpdateRequired();
+            $this->warnUser(
+                'Action required!',
+                'The CakePHP plugin installer has been changed, please update your' .
+                ' application composer.json file to add the post-autoload-dump hook.' .
+                ' See the changes in https://github.com/cakephp/app/pull/216 for more' .
+                ' info.'
+            );
         }
     }
 
     /**
-     * Warn the developer they need to update their root composer.json file
+     * Warn the developer of action they need to take
+     *
+     * @param string $title Warning title
+     * @param string $text warning text
      *
      * @return void
      */
-    public function warnUpdateRequired()
+    public function warnUser($title, $text)
     {
         $wrap = function ($text, $width = 75) {
             return '<error>     ' . str_pad($text, $width) . '</error>';
@@ -80,16 +89,16 @@ class PluginInstaller extends LibraryInstaller
             '',
             '',
             $wrap(''),
-            $wrap('Action required!'),
+            $wrap($title),
             $wrap(''),
-            $wrap('The CakePHP plugin installer has been changed, please update your'),
-            $wrap('application composer.json file to add the post-autoload-dump hook.'),
-            $wrap('See the changes in https://github.com/cakephp/app/pull/216 for more'),
-            $wrap('info.'),
-            $wrap(''),
-            '',
-            '',
         ];
+
+        $lines = explode("\n", wordwrap($text, 68));
+        foreach ($lines as $line) {
+            $messages[] = $wrap($line);
+        }
+
+        $messages = array_merge($messages, [$wrap(''), '', '']);
 
         $this->io->write($messages);
     }
