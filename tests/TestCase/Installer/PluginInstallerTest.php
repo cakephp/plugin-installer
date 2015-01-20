@@ -35,7 +35,7 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase
 
         $this->path = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'plugin-installer-test';
 
-        foreach($this->testDirs as $dir) {
+        foreach ($this->testDirs as $dir) {
             if (!is_dir($this->path . '/' . $dir)) {
                 mkdir($this->path . '/' . $dir);
             }
@@ -67,7 +67,7 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase
             unlink($this->path . '/vendor/cakephp-plugins.php');
         }
 
-        foreach($dirs as $dir) {
+        foreach ($dirs as $dir) {
             if (is_dir($this->path . '/' . $dir)) {
                 rmdir($this->path . '/' . $dir);
             }
@@ -256,7 +256,7 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase
         );
 
         // Ensure all plugin paths are slash terminated
-        foreach($plugins as &$plugin) {
+        foreach ($plugins as &$plugin) {
             $plugin .= '/';
         }
         unset ($plugin);
@@ -307,7 +307,8 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase
      *
      * @return void
      */
-    public function testUpdateConfigAddRootPath() {
+    public function testUpdateConfigAddRootPath()
+    {
         file_put_contents($this->path . '/vendor/cakephp-plugins.php', '<?php return ["plugins" => ["Bake" => "/some/path"]];');
 
         $this->installer->updateConfig('DebugKit', $this->path . '/vendor/cakephp/debugkit');
