@@ -60,7 +60,7 @@ class PluginInstaller extends LibraryInstaller
 
         $root = $composer->getPackage();
 
-        if ($root->getType() !== 'project') {
+        if (!$root || $root->getType() !== 'project') {
             return;
         }
 
