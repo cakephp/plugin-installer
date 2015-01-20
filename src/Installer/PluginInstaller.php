@@ -225,7 +225,7 @@ PHP;
      */
     protected static function configFile($root)
     {
-        return $root . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'plugins.php';
+        return $root . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'plugins.php';
     }
 
     /**
@@ -297,7 +297,7 @@ PHP;
      *
      * @param \Composer\Repository\InstalledRepositoryInterface $repo Repository in which to check.
      * @param \Composer\Package\PackageInterface $package Package instance.
-     * @deprecated use of the post-install-cmd hook is superceeded by the post-autoload-dump hook
+     * @deprecated superceeded by the post-autoload-dump hook
      */
     public function install(InstalledRepositoryInterface $repo, PackageInterface $package)
     {
@@ -316,7 +316,7 @@ PHP;
      * @param \Composer\Repository\InstalledRepositoryInterface $repo Repository in which to check.
      * @param \Composer\Package\PackageInterface $initial Already installed package version.
      * @param \Composer\Package\PackageInterface $target Updated version.
-     * @deprecated use of the post-install-cmd hook is superceeded by the post-autoload-dump hook
+     * @deprecated superceeded by the post-autoload-dump hook
      *
      * @throws \InvalidArgumentException if $initial package is not installed
      */
@@ -337,7 +337,7 @@ PHP;
      *
      * @param \Composer\Repository\InstalledRepositoryInterface $repo Repository in which to check.
      * @param \Composer\Package\PackageInterface $package Package instance.
-     * @deprecated use of the post-install-cmd hook is superceeded by the post-autoload-dump hook
+     * @deprecated superceeded by the post-autoload-dump hook
      */
     public function uninstall(InstalledRepositoryInterface $repo, PackageInterface $package)
     {
@@ -365,7 +365,7 @@ PHP;
         }
         if (!isset($config)) {
             $this->io->write(
-                'ERROR - Your `config/plugins.php` did not define a $config variable. ' .
+                'ERROR - Your `vendor/plugins.php` did not define a $config variable. ' .
                 'Plugin path configuration not updated.'
             );
             return;
@@ -392,7 +392,7 @@ PHP;
     }
 
     /**
-     * Ensure that the config/plugins.php file exists.
+     * Ensure that the vendor/plugins.php file exists.
      *
      * @param string $path the config file path.
      * @return void
@@ -401,7 +401,7 @@ PHP;
     {
         if (file_exists($path)) {
             if ($this->io->isVerbose()) {
-                $this->io->write('config/plugins.php exists.');
+                $this->io->write('vendor/plugins.php exists.');
             }
             return;
         }
@@ -418,7 +418,7 @@ PHP;
         file_put_contents($path, $contents);
 
         if ($this->io->isVerbose()) {
-            $this->io->write('Created config/plugins.php');
+            $this->io->write('Created vendor/plugins.php');
         }
     }
 
