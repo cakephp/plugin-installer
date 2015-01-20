@@ -261,7 +261,7 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase
         }
         unset ($plugin);
 
-        $result = require($path);
+        $result = require $path;
         $expected = [
             'plugins' => $plugins
         ];

@@ -23,10 +23,10 @@ class PluginInstaller extends LibraryInstaller
     /**
      * Check usage upon construction
      *
-     * @param IOInterface $io
-     * @param Composer    $composer
-     * @param string      $type
-     * @param Filesystem  $filesystem
+     * @param IOInterface $io composer object
+     * @param Composer    $composer composer object
+     * @param string      $type what are we loading
+     * @param Filesystem  $filesystem composer object
      */
     public function __construct(IOInterface $io, Composer $composer, $type = 'library', Filesystem $filesystem = null)
     {
@@ -73,7 +73,7 @@ class PluginInstaller extends LibraryInstaller
      */
     public function warnUpdateRequired()
     {
-        $wrap = function($text, $width = 75) {
+        $wrap = function ($text, $width = 75) {
             return '<error>     ' . str_pad($text, $width) . '</error>';
         };
 
@@ -101,7 +101,7 @@ class PluginInstaller extends LibraryInstaller
      * Recreates CakePHP's plugin path map, based on composer information
      * and available app-plugins.
      *
-     * @param Event $event
+     * @param Event $event the composer event object
      * @return void
      */
     public static function postAutoloadDump(Event $event)
@@ -117,7 +117,7 @@ class PluginInstaller extends LibraryInstaller
 
         $plugins = static::determinePlugins($packages, $pluginsDir, $vendorsDir);
 
-        $configFile = static::configFile($root);
+        $configFile = static::_configFile($root);
         static::writeConfigFile($configFile, $plugins);
     }
 
@@ -165,8 +165,8 @@ class PluginInstaller extends LibraryInstaller
     /**
      * Rewrite the config file with a complete list of plugins
      *
-     * @param string $configFile
-     * @param array $plugins
+     * @param string $configFile the path to the config file
+     * @param array $plugins of plugins
      * @return void
      */
     public static function writeConfigFile($configFile, $plugins)
@@ -218,7 +218,7 @@ PHP;
      *
      * @return string absolute file path
      */
-    protected static function configFile($root)
+    protected static function _configFile($root)
     {
         return $root . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'cakephp-plugins.php';
     }
@@ -226,7 +226,7 @@ PHP;
     /**
      * Get the primary namespace for a plugin package.
      *
-     * @param \Composer\Package\PackageInterface $package
+     * @param \Composer\Package\PackageInterface $package composer object
      * @return string The package's primary namespace.
      * @throws \RuntimeException When the package's primary namespace cannot be determined.
      */
@@ -352,8 +352,8 @@ PHP;
     public function updateConfig($name, $path)
     {
         $name = str_replace('\\', '/', $name);
-        $configFile = static::configFile(dirname($this->vendorDir));
-        $this->ensureConfigFile($configFile);
+        $configFile = static::_configFile(dirname($this->vendorDir));
+        $this->_ensureConfigFile($configFile);
 
         $return = include $configFile;
         if (is_array($return) && empty($config)) {
@@ -384,7 +384,7 @@ PHP;
 
             $config['plugins'][$name] = $path;
         }
-        $this->writeConfig($configFile, $config);
+        $this->_writeConfig($configFile, $config);
     }
 
     /**
@@ -395,7 +395,7 @@ PHP;
      * @param string $path the config file path.
      * @return void
      */
-    protected function ensureConfigFile($path)
+    protected function _ensureConfigFile($path)
     {
         if (file_exists($path)) {
             if ($this->io->isVerbose()) {
@@ -404,7 +404,7 @@ PHP;
             return;
         }
 
-        $oldPath = dirname(dirname($path)) . DIRECTORY_SEPARATOR . 'config'. DIRECTORY_SEPARATOR . 'plugins.php';
+        $oldPath = dirname(dirname($path)) . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'plugins.php';
         if (file_exists($oldPath)) {
             copy($oldPath, $path);
             if ($this->io->isVerbose()) {
@@ -437,7 +437,7 @@ PHP;
      * @param array $config The config data to write.
      * @return void
      */
-    protected function writeConfig($path, $config)
+    protected function _writeConfig($path, $config)
     {
         $root = dirname($this->vendorDir);
         $data = '';
