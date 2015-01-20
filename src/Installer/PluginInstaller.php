@@ -1,7 +1,6 @@
 <?php
 namespace Cake\Composer\Installer;
 
-use Cake\Core\Configure\Engine\PhpConfig;
 use Composer\Composer;
 use Composer\Installer\LibraryInstaller;
 use Composer\IO\IOInterface;
