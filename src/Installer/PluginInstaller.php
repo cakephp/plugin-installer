@@ -50,9 +50,9 @@ class PluginInstaller extends LibraryInstaller
         }
         static::$checkUsage = false;
 
-        $root = $composer->getPackage();
+        $package = $composer->getPackage();
 
-        if (!$root || $root->getType() !== 'project') {
+        if (!$package || $package->getType() !== 'project') {
             return;
         }
 
@@ -110,14 +110,13 @@ class PluginInstaller extends LibraryInstaller
         $config = $composer->getConfig();
 
         $vendorDir = $config->get('vendor-dir');
-        $root = dirname($vendorDir);
 
         $packages = $composer->getRepositoryManager()->getLocalRepository()->getPackages();
-        $pluginsDir = $root . DIRECTORY_SEPARATOR . 'plugins';
+        $pluginsDir = dirname($vendorDir) . DIRECTORY_SEPARATOR . 'plugins';
 
         $plugins = static::determinePlugins($packages, $pluginsDir, $vendorDir);
 
-        $configFile = static::_configFile($root);
+        $configFile = static::_configFile($vendorDir);
         static::writeConfigFile($configFile, $plugins);
     }
 
@@ -216,11 +215,12 @@ PHP;
     /**
      * Path to the plugin config file
      *
+     * @param string $vendorDir path to composer-vendor dir
      * @return string absolute file path
      */
-    protected static function _configFile($root)
+    protected static function _configFile($vendorDir)
     {
-        return $root . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'cakephp-plugins.php';
+        return $vendorDir . DIRECTORY_SEPARATOR . 'cakephp-plugins.php';
     }
 
     /**
@@ -352,7 +352,7 @@ PHP;
     public function updateConfig($name, $path)
     {
         $name = str_replace('\\', '/', $name);
-        $configFile = static::_configFile(dirname($this->vendorDir));
+        $configFile = static::_configFile($this->vendorDir);
         $this->_ensureConfigFile($configFile);
 
         $return = include $configFile;
