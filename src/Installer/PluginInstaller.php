@@ -217,7 +217,7 @@ PHP;
      */
     protected static function configFile($root)
     {
-        return $root . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'plugins.php';
+        return $root . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'cakephp-plugins.php';
     }
 
     /**
@@ -284,7 +284,7 @@ PHP;
     /**
      * Installs specific plugin.
      *
-     * After the plugin is installed, app's `plugins.php` config file is updated with
+     * After the plugin is installed, app's `cakephp-plugins.php` config file is updated with
      * plugin namespace to path mapping.
      *
      * @param \Composer\Repository\InstalledRepositoryInterface $repo Repository in which to check.
@@ -302,7 +302,7 @@ PHP;
     /**
      * Updates specific plugin.
      *
-     * After the plugin is installed, app's `plugins.php` config file is updated with
+     * After the plugin is installed, app's `cakephp-plugins.php` config file is updated with
      * plugin namespace to path mapping.
      *
      * @param \Composer\Repository\InstalledRepositoryInterface $repo Repository in which to check.
@@ -357,7 +357,7 @@ PHP;
         }
         if (!isset($config)) {
             $this->io->write(
-                'ERROR - Your `vendor/plugins.php` did not define a $config variable. ' .
+                'ERROR - Your `vendor/cakephp-plugins.php` did not define a $config variable. ' .
                 'Plugin path configuration not updated.'
             );
             return;
@@ -384,7 +384,7 @@ PHP;
     }
 
     /**
-     * Ensure that the vendor/plugins.php file exists.
+     * Ensure that the vendor/cakephp-plugins.php file exists.
      *
      * @param string $path the config file path.
      * @return void
@@ -393,10 +393,11 @@ PHP;
     {
         if (file_exists($path)) {
             if ($this->io->isVerbose()) {
-                $this->io->write('vendor/plugins.php exists.');
+                $this->io->write('vendor/cakephp-plugins.php exists.');
             }
             return;
         }
+
         $contents = <<<'PHP'
 <?php
 $baseDir = dirname(dirname(__FILE__));
@@ -410,7 +411,7 @@ PHP;
         file_put_contents($path, $contents);
 
         if ($this->io->isVerbose()) {
-            $this->io->write('Created vendor/plugins.php');
+            $this->io->write('Created vendor/cakephp-plugins.php');
         }
     }
 
