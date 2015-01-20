@@ -20,7 +20,7 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase
      *
      * @var string
      */
-    protected $testDirs = ['', 'config', 'plugins', 'plugins/Foo', 'plugins/Fee', 'plugins/Foe', 'plugins/Fum'];
+    protected $testDirs = ['', 'vendor', 'plugins', 'plugins/Foo', 'plugins/Fee', 'plugins/Foe', 'plugins/Fum'];
 
     /**
      * setUp
@@ -63,8 +63,8 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase
         parent::tearDown();
         $dirs = array_reverse($this->testDirs);
 
-        if (is_file($this->path . '/config/plugins.php')) {
-            unlink($this->path . '/config/plugins.php');
+        if (is_file($this->path . '/vendor/plugins.php')) {
+            unlink($this->path . '/vendor/plugins.php');
         }
 
         foreach($dirs as $dir) {
@@ -231,7 +231,7 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase
             'TheThing' => $this->path . '/vendors/cakephp/the-thing'
         ];
 
-        $path = $this->path . '/config/plugins.php';
+        $path = $this->path . '/vendor/plugins.php';
         PluginInstaller::writeConfigFile($path, $plugins);
 
         $this->assertFileExists($path);
@@ -271,8 +271,8 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase
     public function testUpdateConfigNoConfigFile()
     {
         $this->installer->updateConfig('DebugKit', '/vendor/cakephp/DebugKit');
-        $this->assertFileExists($this->path . '/config/plugins.php');
-        $contents = file_get_contents($this->path . '/config/plugins.php');
+        $this->assertFileExists($this->path . '/vendor/plugins.php');
+        $contents = file_get_contents($this->path . '/vendor/plugins.php');
         $this->assertContains('<?php', $contents);
         $this->assertContains("'plugins' =>", $contents);
         $this->assertContains("'DebugKit' => '/vendor/cakephp/DebugKit/'", $contents);
@@ -280,7 +280,7 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase
 
     public function testUpdateConfigAddPathInvalidFile()
     {
-        file_put_contents($this->path . '/config/plugins.php', '<?php $foo = "DERP";');
+        file_put_contents($this->path . '/vendor/plugins.php', '<?php $foo = "DERP";');
 
         $this->io->expects($this->once())
             ->method('write');
@@ -290,12 +290,12 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase
     public function testUpdateConfigAddPathFileExists()
     {
         file_put_contents(
-            $this->path . '/config/plugins.php',
+            $this->path . '/vendor/plugins.php',
             '<?php $config = ["plugins" => ["Bake" => "/some/path"]];'
         );
 
         $this->installer->updateConfig('DebugKit', '/vendor/cakephp/DebugKit');
-        $contents = file_get_contents($this->path . '/config/plugins.php');
+        $contents = file_get_contents($this->path . '/vendor/plugins.php');
         $this->assertContains('<?php', $contents);
         $this->assertContains("'plugins' =>", $contents);
         $this->assertContains("'DebugKit' => '/vendor/cakephp/DebugKit/'", $contents);
@@ -308,10 +308,10 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase
      * @return void
      */
     public function testUpdateConfigAddRootPath() {
-        file_put_contents($this->path . '/config/plugins.php', '<?php return ["plugins" => ["Bake" => "/some/path"]];');
+        file_put_contents($this->path . '/vendor/plugins.php', '<?php return ["plugins" => ["Bake" => "/some/path"]];');
 
         $this->installer->updateConfig('DebugKit', $this->path . '/vendor/cakephp/debugkit');
-        $contents = file_get_contents($this->path . '/config/plugins.php');
+        $contents = file_get_contents($this->path . '/vendor/plugins.php');
         $this->assertContains('<?php', $contents);
         $this->assertContains('$baseDir = dirname(dirname(__FILE__));', $contents);
         $this->assertContains("'DebugKit' => \$baseDir . '/vendor/cakephp/debugkit/'", $contents);
@@ -325,12 +325,12 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase
      */
     public function testUpdateConfigAddPath()
     {
-        file_put_contents($this->path . '/config/plugins.php', '<?php return ["plugins" => ["Bake" => "/some/path"]];');
+        file_put_contents($this->path . '/vendor/plugins.php', '<?php return ["plugins" => ["Bake" => "/some/path"]];');
 
         $this->installer->updateConfig('DebugKit', '/vendor/cakephp/debugkit');
         $this->installer->updateConfig('ADmad\JwtAuth', '/vendor/admad/cakephp-jwt-auth');
 
-        $contents = file_get_contents($this->path . '/config/plugins.php');
+        $contents = file_get_contents($this->path . '/vendor/plugins.php');
         $this->assertContains('<?php', $contents);
         $this->assertContains("'DebugKit' => '/vendor/cakephp/debugkit/'", $contents);
         $this->assertContains("'Bake' => '/some/path'", $contents);
@@ -344,11 +344,11 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase
      */
     public function testUpdateConfigAddPathWindows()
     {
-        file_put_contents($this->path . '/config/plugins.php', '<?php return ["plugins" => ["Bake" => "/some/path"]];');
+        file_put_contents($this->path . '/vendor/plugins.php', '<?php return ["plugins" => ["Bake" => "/some/path"]];');
 
         $this->installer->updateConfig('DebugKit', '\vendor\cakephp\debugkit');
 
-        $contents = file_get_contents($this->path . '/config/plugins.php');
+        $contents = file_get_contents($this->path . '/vendor/plugins.php');
         $this->assertContains('<?php', $contents);
         $this->assertContains("'DebugKit' => '/vendor/cakephp/debugkit/'", $contents);
     }
@@ -361,12 +361,12 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase
     public function testUpdateConfigRemovePath()
     {
         file_put_contents(
-            $this->path . '/config/plugins.php',
+            $this->path . '/vendor/plugins.php',
             '<?php $config = ["plugins" => ["Bake" => "/some/path"]];'
         );
 
         $this->installer->updateConfig('Bake', '');
-        $contents = file_get_contents($this->path . '/config/plugins.php');
+        $contents = file_get_contents($this->path . '/vendor/plugins.php');
         $this->assertContains('<?php', $contents);
         $this->assertContains("'plugins' =>", $contents);
         $this->assertNotContains("Bake", $contents);

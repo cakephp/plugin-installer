@@ -19,6 +19,6 @@ class PluginInstaller extends PluginInstallerSrc
     public static function configFile($root)
     {
         $root = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'plugin-installer-test';
-        return $root . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'plugins.php';
+        return $root . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'plugins.php';
     }
 }
