@@ -17,9 +17,8 @@ class PluginInstaller extends LibraryInstaller
      * A flag to check usage - once
      *
      * @var bool
-     * @access public
      */
-    static $checkUsage = true;
+    protected static $checkUsage = true;
 
     /**
      * io instance
@@ -52,7 +51,8 @@ class PluginInstaller extends LibraryInstaller
      * @param Composer $composer
      * @return void
      */
-    public function checkUsage(Composer $composer) {
+    public function checkUsage(Composer $composer)
+    {
         if (static::$checkUsage === false) {
             return;
         }
