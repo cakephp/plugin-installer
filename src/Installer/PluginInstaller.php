@@ -21,14 +21,7 @@ class PluginInstaller extends LibraryInstaller
     protected static $checkUsage = true;
 
     /**
-     * io instance
-     *
-     * @var \Composer\IO\IOInterface
-     */
-    protected $io;
-
-    /**
-     * Store a reference to the io for warnings
+     * Check usage upon construction
      *
      * @param IOInterface $io
      * @param Composer    $composer
@@ -38,7 +31,6 @@ class PluginInstaller extends LibraryInstaller
     public function __construct(IOInterface $io, Composer $composer, $type = 'library', Filesystem $filesystem = null)
     {
         parent::__construct($io, $composer, $type, $filesystem);
-        $this->io = $io;
         $this->checkUsage($composer);
     }
 
