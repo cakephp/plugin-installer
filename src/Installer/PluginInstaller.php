@@ -73,18 +73,21 @@ class PluginInstaller extends LibraryInstaller
      */
     public function warnUpdateRequired()
     {
-        $emptyLine = sprintf('<error>%s</error>', str_repeat(' ', 80));
+        $wrap = function($text, $width = 75) {
+            return '<error>     ' . str_pad($text, $width) . '</error>';
+        };
 
         $messages = [
             '',
             '',
-            $emptyLine,
-            '<error>     ' . str_pad('Action required!', 75) . '</error>',
-            $emptyLine,
-            '<error>     ' . str_pad('The CakePHP plugin installer has been changed, please update your', 75) . '</error>',
-            '<error>     ' . str_pad('application composer.json file to add the post-autoload-dump hook.', 75) . '</error>',
-            '<error>     ' . str_pad('See the changes in https://github.com/cakephp/app/pull/216 for more info.', 75) . '</error>',
-            $emptyLine,
+            $wrap(''),
+            $wrap('Action required!'),
+            $wrap(''),
+            $wrap('The CakePHP plugin installer has been changed, please update your'),
+            $wrap('application composer.json file to add the post-autoload-dump hook.'),
+            $wrap('See the changes in https://github.com/cakephp/app/pull/216 for more'),
+            $wrap('info.'),
+            $wrap(''),
             '',
             '',
         ];
@@ -133,7 +136,7 @@ class PluginInstaller extends LibraryInstaller
     {
         $plugins = [];
 
-        foreach($packages as $package) {
+        foreach ($packages as $package) {
             if ($package->getType() !== 'cakephp-plugin') {
                 continue;
             }
@@ -145,7 +148,7 @@ class PluginInstaller extends LibraryInstaller
 
         if (is_dir($pluginsDir)) {
             $dir = new \DirectoryIterator($pluginsDir);
-            foreach($dir as $info) {
+            foreach ($dir as $info) {
                 if (!$info->isDir() || $info->isDot()) {
                     continue;
                 }
