@@ -386,6 +386,8 @@ PHP;
     /**
      * Ensure that the vendor/cakephp-plugins.php file exists.
      *
+     * If config/plugins.php is found - copy it to the vendors folder
+     *
      * @param string $path the config file path.
      * @return void
      */
@@ -394,6 +396,15 @@ PHP;
         if (file_exists($path)) {
             if ($this->io->isVerbose()) {
                 $this->io->write('vendor/cakephp-plugins.php exists.');
+            }
+            return;
+        }
+
+        $oldPath = dirname(dirname($path)) . DIRECTORY_SEPARATOR . 'config'. DIRECTORY_SEPARATOR . 'plugins.php';
+        if (file_exists($oldPath)) {
+            copy($oldPath, $path);
+            if ($this->io->isVerbose()) {
+                $this->io->write('config/plugins.php found and copied to vendor/cakephp-plugins.php.');
             }
             return;
         }
