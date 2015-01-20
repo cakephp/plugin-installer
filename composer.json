@@ -11,7 +11,8 @@
     ],
     "require-dev": {
         "composer/composer": "1.0.*@dev",
-        "cakephp/core": "dev-master"
+        "cakephp/core": "dev-master",
+        "cakephp/cakephp-codesniffer": "dev-master"
     },
     "autoload": {
         "psr-4": {
