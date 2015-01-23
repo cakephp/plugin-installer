@@ -57,8 +57,7 @@ class PluginInstaller extends LibraryInstaller
 
         $scripts = $composer->getPackage()->getScripts();
         $postAutoloadDump = 'Cake\Composer\Installer\PluginInstaller::postAutoloadDump';
-        if (
-            !isset($scripts['post-autoload-dump']) ||
+        if (!isset($scripts['post-autoload-dump']) ||
             !in_array($postAutoloadDump, $scripts['post-autoload-dump'])
         ) {
             $this->warnUser(
@@ -191,6 +190,9 @@ class PluginInstaller extends LibraryInstaller
             // Normalize to *nix paths.
             $pluginPath = str_replace('\\', '/', $pluginPath);
             $pluginPath .= '/';
+
+            // Namespaced plugins should use /
+            $name = str_replace('\\', '/', $name);
 
             $data[] = sprintf("        '%s' => '%s'", $name, $pluginPath);
         }
