@@ -57,8 +57,7 @@ class PluginInstaller extends LibraryInstaller
 
         $scripts = $composer->getPackage()->getScripts();
         $postAutoloadDump = 'Cake\Composer\Installer\PluginInstaller::postAutoloadDump';
-        if (
-            !isset($scripts['post-autoload-dump']) ||
+        if (!isset($scripts['post-autoload-dump']) ||
             !in_array($postAutoloadDump, $scripts['post-autoload-dump'])
         ) {
             $this->warnUser(
