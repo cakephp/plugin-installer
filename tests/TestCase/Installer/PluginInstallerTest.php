@@ -228,7 +228,8 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase
             'Fum' => $this->path . '/plugins/Fum',
             'OddOneOut' => '/some/other/path',
             'Princess' => $this->path . '/vendor/cakephp/princess',
-            'TheThing' => $this->path . '/vendor/cakephp/the-thing'
+            'TheThing' => $this->path . '/vendor/cakephp/the-thing',
+            'Vendor\Plugin' => $this->path . '/vendor/vendor/plugin'
         ];
 
         $path = $this->path . '/vendor/cakephp-plugins.php';
@@ -254,6 +255,11 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase
             $contents,
             'paths should stay absolute if it\'s not under the application root'
         );
+        $this->assertContains(
+            "'Vendor/Plugin' => \$baseDir . '/vendor/vendor/plugin/'",
+            $contents,
+            'Plugin namespaces should use forward slash'
+        );
 
         // Ensure all plugin paths are slash terminated
         foreach ($plugins as &$plugin) {
@@ -265,7 +271,9 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase
         $expected = [
             'plugins' => $plugins
         ];
-        $this->assertSame($expected, $result, 'The evaluated result should be the same as the input');
+        $expected['plugins']['Vendor/Plugin'] = $expected['plugins']['Vendor\Plugin'];
+        unset($expected['plugins']['Vendor\Plugin']);
+        $this->assertSame($expected, $result, 'The evaluated result should be the same as the input except for namespaced plugin');
     }
 
     public function testUpdateConfigNoConfigFile()
