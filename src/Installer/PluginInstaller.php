@@ -192,6 +192,9 @@ class PluginInstaller extends LibraryInstaller
             $pluginPath = str_replace('\\', '/', $pluginPath);
             $pluginPath .= '/';
 
+            // Namespaced plugins should use /
+            $name = str_replace('\\', '/', $name);
+
             $data[] = sprintf("        '%s' => '%s'", $name, $pluginPath);
         }
 
