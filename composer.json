@@ -11,11 +11,16 @@
     ],
     "require-dev": {
         "composer/composer": "1.0.*@dev",
-        "cakephp/core": "dev-master"
+        "cakephp/cakephp-codesniffer": "dev-master"
     },
     "autoload": {
         "psr-4": {
             "Cake\\Composer\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Cake\\Test\\Composer\\": "tests"
         }
     },
     "extra": {
