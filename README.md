@@ -9,16 +9,14 @@ by composer in `vendor/`.
 Usage
 -----
 
-In your CakePHP plugin folder run:
+Your CakePHP application should already depend on `cakephp/plugin-installer`, if
+not in your CakePHP application run:
 
 ```
 composer require cakephp/plugin-installer:*
 ```
 
-or add
-
-`"cakephp/plugin-installer": "*"` to the `require` section of your
-plugin's `composer.json`.
+Your plugins themselves do not need to require `cakephp/plugin-installer`.
 
 For the installer to work properly ensure that your plugin's composer config
 file has a proper autoload section. Assuming your plugin's namespace is "MyPlugin"
@@ -44,7 +42,7 @@ also have an "autoload-dev" section for loading test files:
 "autoload-dev": {
     "psr-4": {
         "MyPlugin\\Test\\": "tests",
-        "Cake\\Test\\Fixture\\" : "vendor/cakephp/cakephp/test/Fixture"
+        "Cake\\Test\\" : "vendor/cakephp/cakephp/test"
     }
 }
 ```
@@ -61,7 +59,7 @@ would be like:
 "autoload-dev": {
     "psr-4": {
         "MyVendor\\MyPlugin\\Test\\": "tests",
-        "Cake\\Test\\Fixture\\" : "vendor/cakephp/cakephp/test/Fixture"
+        "Cake\\Test\\" : "vendor/cakephp/cakephp/test"
     }
 }
 ```
