@@ -16,13 +16,18 @@ not in your CakePHP application run:
 composer require cakephp/plugin-installer:*
 ```
 
-Your plugins themselves do not need to require `cakephp/plugin-installer`.
+Your plugins themselves do **not** need to require `cakephp/plugin-installer`. They
+only need to specify the `type` in their composer config:
+
+```json
+"type": "cakephp-plugin"
+```
 
 For the installer to work properly ensure that your plugin's composer config
 file has a proper autoload section. Assuming your plugin's namespace is "MyPlugin"
 the autoload section would be like:
 
-```
+```json
 "autoload": {
     "psr-4": {
         "MyPlugin\\": "src"
@@ -33,7 +38,7 @@ the autoload section would be like:
 Not strictly necessary for the working of the installer but ideally you would
 also have an "autoload-dev" section for loading test files:
 
-```
+```json
 "autoload": {
     "psr-4": {
         "MyPlugin\\": "src"
@@ -50,7 +55,7 @@ also have an "autoload-dev" section for loading test files:
 If your top level namespace is a vendor name then your namespace to path mapping
 would be like:
 
-```
+```json
 "autoload": {
     "psr-4": {
         "MyVendor\\MyPlugin\\": "src"
