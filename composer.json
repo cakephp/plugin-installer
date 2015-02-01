@@ -15,7 +15,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Cake\\Composer\\": "src/"
+            "Cake\\Composer\\": "src"
         }
     },
     "autoload-dev": {
