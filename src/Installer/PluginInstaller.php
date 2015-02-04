@@ -190,6 +190,9 @@ class PluginInstaller extends LibraryInstaller
             // Normalize to *nix paths.
             $pluginPath = str_replace('\\', '/', $pluginPath);
             $pluginPath .= '/';
+            if ($pluginPath[0] !== '/') {
+                $pluginPath = '/' . $pluginPath;
+            }
 
             // Namespaced plugins should use /
             $name = str_replace('\\', '/', $name);
