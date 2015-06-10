@@ -95,72 +95,72 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase
      */
     public function testPrimaryNamespace()
     {
-        $autoload = array(
-            'psr-4' => array(
+        $autoload = [
+            'psr-4' => [
                 'FOC\\Authenticate' => ''
-            )
-        );
+            ]
+        ];
         $this->package->setAutoload($autoload);
 
         $ns = PluginInstaller::primaryNamespace($this->package);
         $this->assertEquals('FOC\Authenticate', $ns);
 
-        $autoload = array(
-            'psr-4' => array(
+        $autoload = [
+            'psr-4' => [
                 'FOC\Acl\Test' => './tests',
                 'FOC\Acl' => ''
-            )
-        );
+            ]
+        ];
         $this->package->setAutoload($autoload);
         $ns = PluginInstaller::primaryNamespace($this->package);
         $this->assertEquals('FOC\Acl', $ns);
 
-        $autoload = array(
-            'psr-4' => array(
+        $autoload = [
+            'psr-4' => [
                 'Foo\Bar' => 'foo',
                 'Acme\Plugin' => './src'
-            )
-        );
+            ]
+        ];
         $this->package->setAutoload($autoload);
         $ns = PluginInstaller::primaryNamespace($this->package);
         $this->assertEquals('Acme\Plugin', $ns);
 
-        $autoload = array(
-            'psr-4' => array(
+        $autoload = [
+            'psr-4' => [
                 'Foo\Bar' => 'bar',
                 'Foo\\' => ''
-            )
-        );
+            ]
+        ];
         $this->package->setAutoload($autoload);
         $ns = PluginInstaller::primaryNamespace($this->package);
         $this->assertEquals('Foo', $ns);
 
-        $autoload = array(
-            'psr-4' => array(
+        $autoload = [
+            'psr-4' => [
                 'Foo\Bar' => 'bar',
                 'Foo' => '.'
-            )
-        );
+            ]
+        ];
         $this->package->setAutoload($autoload);
         $ns = PluginInstaller::primaryNamespace($this->package);
         $this->assertEquals('Foo', $ns);
 
-        $autoload = array(
-            'psr-4' => array(
+        $autoload = [
+            'psr-4' => [
                 'Acme\Foo\Bar' => 'bar',
                 'Acme\Foo\\' => ''
-            )
-        );
+            ]
+        ];
         $this->package->setAutoload($autoload);
         $ns = PluginInstaller::primaryNamespace($this->package);
         $this->assertEquals('Acme\Foo', $ns);
 
-        $autoload = array(
-            'psr-4' => array(
+        $autoload = [
+            'psr-4' => [
                 'Acme\Foo\Bar' => '',
                 'Acme\Foo' => 'src'
-            )
-        );
+            ]
+        ];
         $this->package->setAutoload($autoload);
         $name = PluginInstaller::primaryNamespace($this->package);
         $this->assertEquals('Acme\Foo', $name);
