@@ -1,3 +1,6 @@
+This installed has been deprecated and no longer required by CakePHP plugins.
+=============================================================================
+
 CakePHP Plugin Installer
 ========================
 
