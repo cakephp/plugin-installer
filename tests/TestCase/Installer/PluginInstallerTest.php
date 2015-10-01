@@ -265,7 +265,7 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase
         foreach ($plugins as &$plugin) {
             $plugin .= '/';
         }
-        unset ($plugin);
+        unset($plugin);
 
         $result = require $path;
         $expected = [
