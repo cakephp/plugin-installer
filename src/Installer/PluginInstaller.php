@@ -173,23 +173,24 @@ class PluginInstaller extends LibraryInstaller
      *
      * @param string $configFile the path to the config file
      * @param array $plugins of plugins
+     * @param string|null $root The root directory. Defaults to a value generated from $configFile
      * @return void
      */
-    public static function writeConfigFile($configFile, $plugins)
+    public static function writeConfigFile($configFile, $plugins, $root = null)
     {
-        $root = dirname(dirname($configFile));
+        $root = $root ?: dirname(dirname($configFile));
 
         $data = [];
         foreach ($plugins as $name => $pluginPath) {
+            // Normalize to *nix paths.
+            $pluginPath = str_replace('\\', '/', $pluginPath);
+            $pluginPath .= '/';
+
             $pluginPath = str_replace(
                 DIRECTORY_SEPARATOR . DIRECTORY_SEPARATOR,
                 DIRECTORY_SEPARATOR,
                 $pluginPath
             );
-
-            // Normalize to *nix paths.
-            $pluginPath = str_replace('\\', '/', $pluginPath);
-            $pluginPath .= '/';
 
             // Namespaced plugins should use /
             $name = str_replace('\\', '/', $name);
@@ -199,16 +200,15 @@ class PluginInstaller extends LibraryInstaller
 
         $data = implode(",\n", $data);
 
-        $contents = <<<PHP
-<?php
-\$baseDir = dirname(dirname(__FILE__));
+        $contents = '<?php
+$baseDir = dirname(dirname(__FILE__));
 return [
-    'plugins' => [
-$data
+    \'plugins\' => [
+%s
     ]
 ];
-
-PHP;
+';
+        $contents = sprintf($contents, $data);
 
         $root = str_replace(
             DIRECTORY_SEPARATOR . DIRECTORY_SEPARATOR,
@@ -219,6 +219,7 @@ PHP;
         // Normalize to *nix paths.
         $root = str_replace('\\', '/', $root);
         $contents = str_replace('\'' . $root, '$baseDir . \'', $contents);
+
         file_put_contents($configFile, $contents);
     }
 
@@ -382,19 +383,10 @@ PHP;
         if ($path == null) {
             unset($config['plugins'][$name]);
         } else {
-            $path = str_replace(
-                DIRECTORY_SEPARATOR . DIRECTORY_SEPARATOR,
-                DIRECTORY_SEPARATOR,
-                $path
-            );
-
-            // Normalize to *nix paths.
-            $path = str_replace('\\', '/', $path);
-            $path .= '/';
-
             $config['plugins'][$name] = $path;
         }
-        $this->_writeConfig($configFile, $config);
+        $root = dirname($this->vendorDir);
+        static::writeConfigFile($configFile, $config['plugins'], $root);
     }
 
     /**
@@ -423,47 +415,14 @@ PHP;
             return;
         }
 
-        $contents = "<?php
-\$baseDir = dirname(dirname(__FILE__));
-return [
-    'plugins' => []
-];
-";
         if (!is_dir(dirname($path))) {
             mkdir(dirname($path));
         }
-        file_put_contents($path, $contents);
+        $root = dirname($this->vendorDir);
+        static::writeConfigFile($path, [], $root);
 
         if ($this->io->isVerbose()) {
             $this->io->write('Created vendor/cakephp-plugins.php');
         }
-    }
-
-    /**
-     * Dump the generate configuration out to a file.
-     *
-     * @param string $path The path to write.
-     * @param array $config The config data to write.
-     * @return void
-     */
-    protected function _writeConfig($path, $config)
-    {
-        $root = dirname($this->vendorDir);
-        $data = '';
-        foreach ($config['plugins'] as $name => $pluginPath) {
-            $data .= sprintf("        '%s' => '%s',\n", $name, $pluginPath);
-        }
-        $contents = "<?php
-\$baseDir = dirname(dirname(__FILE__));
-return [
-    'plugins' => [
-$data
-    ]
-];
-";
-
-        $root = str_replace('\\', '/', $root);
-        $contents = str_replace('\'' . $root, '$baseDir . \'', $contents);
-        file_put_contents($path, $contents);
     }
 }
