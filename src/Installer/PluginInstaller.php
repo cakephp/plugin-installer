@@ -423,13 +423,12 @@ PHP;
             return;
         }
 
-        $contents = <<<'PHP'
-<?php
-$baseDir = dirname(dirname(__FILE__));
+        $contents = "<?php
+\$baseDir = dirname(dirname(__FILE__));
 return [
     'plugins' => []
 ];
-PHP;
+";
         if (!is_dir(dirname($path))) {
             mkdir(dirname($path));
         }
@@ -454,16 +453,14 @@ PHP;
         foreach ($config['plugins'] as $name => $pluginPath) {
             $data .= sprintf("        '%s' => '%s',\n", $name, $pluginPath);
         }
-        $contents = <<<PHP
-<?php
+        $contents = "<?php
 \$baseDir = dirname(dirname(__FILE__));
 return [
     'plugins' => [
 $data
     ]
 ];
-
-PHP;
+";
 
         $root = str_replace('\\', '/', $root);
         $contents = str_replace('\'' . $root, '$baseDir . \'', $contents);
