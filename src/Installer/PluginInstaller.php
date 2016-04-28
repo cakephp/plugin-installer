@@ -200,15 +200,24 @@ class PluginInstaller extends LibraryInstaller
 
         $data = implode(",\n", $data);
 
-        $contents = '<?php
-$baseDir = dirname(dirname(__FILE__));
+        $contents = <<<'PHP'
+<?php
+$baseDir = dirname(dirname(__file__));
 return [
-    \'plugins\' => [
+    'plugins' => [
 %s
     ]
 ];
-';
+PHP;
         $contents = sprintf($contents, $data);
+
+        // Gross hacks to work around composer smashing `__FILE__` in this
+        // PHP file when it runs the code through eval()
+        $uppercase = function ($matches)
+        {
+            return strtoupper($matches[0]);
+        };
+        $contents = preg_replace_callback('/__file__/', $uppercase, $contents);
 
         $root = str_replace(
             DIRECTORY_SEPARATOR . DIRECTORY_SEPARATOR,
