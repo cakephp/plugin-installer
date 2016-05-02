@@ -213,8 +213,7 @@ PHP;
 
         // Gross hacks to work around composer smashing `__FILE__` in this
         // PHP file when it runs the code through eval()
-        $uppercase = function ($matches)
-        {
+        $uppercase = function ($matches) {
             return strtoupper($matches[0]);
         };
         $contents = preg_replace_callback('/__file__/', $uppercase, $contents);
