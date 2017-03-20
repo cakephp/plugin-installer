@@ -42,13 +42,13 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase
         }
 
         $composer = new Composer();
-        $config = $this->getMock('Composer\Config');
+        $config = $this->getMockBuilder('Composer\Config')->getMock();
         $config->expects($this->any())
             ->method('get')
             ->will($this->returnValue($this->path . '/vendor'));
         $composer->setConfig($config);
 
-        $this->io = $this->getMock('Composer\IO\IOInterface');
+        $this->io = $this->getMockBuilder('Composer\IO\IOInterface')->getMock();
         $rm = new RepositoryManager(
             $this->io,
             $config
