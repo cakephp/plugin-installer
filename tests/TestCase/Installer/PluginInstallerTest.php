@@ -3,12 +3,11 @@ namespace Cake\Test\TestCase\Composer\Installer;
 
 use Cake\Test\Composer\Installer\PluginInstaller;
 use Composer\Composer;
-use Composer\Config;
 use Composer\Package\Package;
-use Composer\Package\RootPackage;
 use Composer\Repository\RepositoryManager;
+use PHPUnit\Framework\TestCase;
 
-class PluginInstallerTest extends \PHPUnit_Framework_TestCase
+class PluginInstallerTest extends TestCase
 {
 
     public $package;
