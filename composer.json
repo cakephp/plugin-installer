@@ -11,6 +11,7 @@
     ],
     "require-dev": {
         "composer/composer": "1.0.*@dev",
+        "phpunit/phpunit": "^4.8|^5.7|^6.0",
         "cakephp/cakephp-codesniffer": "dev-master"
     },
     "autoload": {
@@ -25,6 +26,5 @@
     },
     "extra": {
         "class": "Cake\\Composer\\Installer\\PluginInstaller"
-    },
-    "minimum-stability": "dev"
+    }
 }

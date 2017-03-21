@@ -3,12 +3,11 @@ namespace Cake\Test\TestCase\Composer\Installer;
 
 use Cake\Test\Composer\Installer\PluginInstaller;
 use Composer\Composer;
-use Composer\Config;
 use Composer\Package\Package;
-use Composer\Package\RootPackage;
 use Composer\Repository\RepositoryManager;
+use PHPUnit\Framework\TestCase;
 
-class PluginInstallerTest extends \PHPUnit_Framework_TestCase
+class PluginInstallerTest extends TestCase
 {
 
     public $package;
@@ -42,13 +41,13 @@ class PluginInstallerTest extends \PHPUnit_Framework_TestCase
         }
 
         $composer = new Composer();
-        $config = $this->getMock('Composer\Config');
+        $config = $this->getMockBuilder('Composer\Config')->getMock();
         $config->expects($this->any())
             ->method('get')
             ->will($this->returnValue($this->path . '/vendor'));
         $composer->setConfig($config);
 
-        $this->io = $this->getMock('Composer\IO\IOInterface');
+        $this->io = $this->getMockBuilder('Composer\IO\IOInterface')->getMock();
         $rm = new RepositoryManager(
             $this->io,
             $config
