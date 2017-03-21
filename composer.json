@@ -11,7 +11,7 @@
     ],
     "require-dev": {
         "composer/composer": "1.0.*@dev",
-        "phpunit/phpunit": "^5.7|^6.0",
+        "phpunit/phpunit": "^4.8|^5.7|^6.0",
         "cakephp/cakephp-codesniffer": "dev-master"
     },
     "autoload": {
