@@ -117,11 +117,9 @@ class PluginInstaller extends LibraryInstaller
         $config = $composer->getConfig();
 
         $vendorDir = realpath($config->get('vendor-dir'));
-
-        $packages = $composer->getRepositoryManager()->getLocalRepository()->getPackages();
         $pluginsDir = dirname($vendorDir) . DIRECTORY_SEPARATOR . 'plugins';
 
-        $plugins = static::determinePlugins($packages, $pluginsDir, $vendorDir);
+        $plugins = static::determinePlugins($composer, $pluginsDir, $vendorDir);
 
         $configFile = static::_configFile($vendorDir);
         static::writeConfigFile($configFile, $plugins);
@@ -133,13 +131,15 @@ class PluginInstaller extends LibraryInstaller
      * Add all composer packages of type cakephp-plugin, and all plugins located
      * in the plugins directory to a plugin-name indexed array of paths
      *
-     * @param array $packages an array of \Composer\Package\PackageInterface objects
+     * @param Composer $composer object
      * @param string $pluginsDir the path to the plugins dir
      * @param string $vendorDir the path to the vendor dir
      * @return array plugin-name indexed paths to plugins
      */
-    public static function determinePlugins($packages, $pluginsDir = 'plugins', $vendorDir = 'vendor')
+    public static function determinePlugins(Composer $composer, $pluginsDir = 'plugins', $vendorDir = 'vendor')
     {
+        $packages = $composer->getRepositoryManager()->getLocalRepository()->getPackages();
+
         $plugins = [];
 
         foreach ($packages as $package) {
@@ -159,8 +159,12 @@ class PluginInstaller extends LibraryInstaller
                     continue;
                 }
 
-                $name = $info->getFilename();
-                $plugins[$name] = $pluginsDir . DIRECTORY_SEPARATOR . $name;
+                $ns = static::primaryNamespace(
+                    $composer->getPackage(),
+                    basename($pluginsDir) . '/' .  $info->getFilename() . '/'
+                );
+
+                $plugins[$ns] = $pluginsDir . DIRECTORY_SEPARATOR . $info->getFilename();
             }
         }
 
@@ -247,10 +251,11 @@ PHP;
      * Get the primary namespace for a plugin package.
      *
      * @param \Composer\Package\PackageInterface $package composer object
+     * @param string $plugin [optional] to search plugin in autoload
      * @return string The package's primary namespace.
      * @throws \RuntimeException When the package's primary namespace cannot be determined.
      */
-    public static function primaryNamespace($package)
+    public static function primaryNamespace($package, $plugin = '')
     {
         $primaryNs = null;
         $autoLoad = $package->getAutoload();
@@ -265,7 +270,7 @@ PHP;
                 break;
             }
 
-            $matches = preg_grep('#^(\./)?src/?$#', $pathMap);
+            $matches = preg_grep("#^(\\./)?{$plugin}src/?$#", $pathMap);
             if ($matches) {
                 $primaryNs = key($matches);
                 break;
