@@ -167,6 +167,10 @@ class PluginInstaller extends LibraryInstaller
                     }
 
                     $name = $info->getFilename();
+                    if ($name{0} === '.') {
+                        continue;
+                    }
+
                     $plugins[$name] = $path . DIRECTORY_SEPARATOR . $name;
                 }
             }
