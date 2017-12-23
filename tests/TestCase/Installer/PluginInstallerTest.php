@@ -19,7 +19,17 @@ class PluginInstallerTest extends TestCase
      *
      * @var string
      */
-    protected $testDirs = ['', 'vendor', 'plugins', 'plugins/Foo', 'plugins/Fee', 'plugins/Foe', 'plugins/Fum'];
+    protected $testDirs = [
+        '',
+        'vendor',
+        'plugins',
+        'plugins/Foo',
+        'plugins/Fee',
+        'plugins/Foe',
+        'plugins/Fum',
+        'app_plugins',
+        'app_plugins/Bar',
+    ];
 
     /**
      * setUp
@@ -208,6 +218,23 @@ class PluginInstallerTest extends TestCase
         );
 
         $expected = [
+            'Fee' => $this->path . '/plugins/Fee',
+            'Foe' => $this->path . '/plugins/Foe',
+            'Foo' => $this->path . '/plugins/Foo',
+            'Fum' => $this->path . '/plugins/Fum',
+            'Princess' => $this->path . '/vendor/cakephp/princess',
+            'TheThing' => $this->path . '/vendor/cakephp/the-thing'
+        ];
+        $this->assertSame($expected, $return, 'Composer and application plugins should be listed');
+
+        $return = PluginInstaller::determinePlugins(
+            $packages,
+            [$this->path . '/plugins', $this->path . '/app_plugins'],
+            $this->path . '/vendor'
+        );
+
+        $expected = [
+            'Bar' => $this->path . '/app_plugins/Bar',
             'Fee' => $this->path . '/plugins/Fee',
             'Foe' => $this->path . '/plugins/Foe',
             'Foo' => $this->path . '/plugins/Foo',
