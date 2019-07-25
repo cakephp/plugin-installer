@@ -167,7 +167,7 @@ class PluginInstaller extends LibraryInstaller
                     }
 
                     $name = $info->getFilename();
-                    if ($name{0} === '.') {
+                    if ($name[0] === '.') {
                         continue;
                     }
 
