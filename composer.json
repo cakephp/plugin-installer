@@ -6,7 +6,7 @@
     "authors": [
         {
             "name": "CakePHP Community",
-            "homepage": "http://cakephp.org"
+            "homepage": "https://cakephp.org"
         }
     ],
     "require-dev": {
@@ -16,12 +16,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Cake\\Composer\\": "src"
+            "Cake\\Composer\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Cake\\Test\\Composer\\": "tests"
+            "Cake\\Test\\Composer\\": "tests/"
         }
     },
     "extra": {
