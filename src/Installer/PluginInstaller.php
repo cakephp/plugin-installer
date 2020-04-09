@@ -57,7 +57,8 @@ class PluginInstaller extends LibraryInstaller
 
         $scripts = $composer->getPackage()->getScripts();
         $postAutoloadDump = 'Cake\Composer\Installer\PluginInstaller::postAutoloadDump';
-        if (!isset($scripts['post-autoload-dump']) ||
+        if (
+            !isset($scripts['post-autoload-dump']) ||
             !in_array($postAutoloadDump, $scripts['post-autoload-dump'])
         ) {
             $this->warnUser(
@@ -331,6 +332,7 @@ PHP;
      *
      * This installer only supports package of type 'cakephp-plugin'.
      *
+     * @param string $packageType Package type.
      * @return bool
      */
     public function supports($packageType)
@@ -346,6 +348,7 @@ PHP;
      *
      * @param \Composer\Repository\InstalledRepositoryInterface $repo Repository in which to check.
      * @param \Composer\Package\PackageInterface $package Package instance.
+     * @return void
      * @deprecated superceeded by the post-autoload-dump hook
      */
     public function install(InstalledRepositoryInterface $repo, PackageInterface $package)
@@ -365,6 +368,7 @@ PHP;
      * @param \Composer\Repository\InstalledRepositoryInterface $repo Repository in which to check.
      * @param \Composer\Package\PackageInterface $initial Already installed package version.
      * @param \Composer\Package\PackageInterface $target Updated version.
+     * @return void
      * @deprecated superceeded by the post-autoload-dump hook
      *
      * @throws \InvalidArgumentException if $initial package is not installed
@@ -386,6 +390,7 @@ PHP;
      *
      * @param \Composer\Repository\InstalledRepositoryInterface $repo Repository in which to check.
      * @param \Composer\Package\PackageInterface $package Package instance.
+     * @return void
      * @deprecated superceeded by the post-autoload-dump hook
      */
     public function uninstall(InstalledRepositoryInterface $repo, PackageInterface $package)
@@ -401,6 +406,7 @@ PHP;
      *
      * @param string $name The plugin name being installed.
      * @param string $path The path, the plugin is being installed into.
+     * @return void
      */
     public function updateConfig($name, $path)
     {

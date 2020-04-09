@@ -106,8 +106,8 @@ class PluginInstallerTest extends TestCase
     {
         $autoload = [
             'psr-4' => [
-                'FOC\\Authenticate' => ''
-            ]
+                'FOC\\Authenticate' => '',
+            ],
         ];
         $this->package->setAutoload($autoload);
 
@@ -117,8 +117,8 @@ class PluginInstallerTest extends TestCase
         $autoload = [
             'psr-4' => [
                 'FOC\Acl\Test' => './tests',
-                'FOC\Acl' => ''
-            ]
+                'FOC\Acl' => '',
+            ],
         ];
         $this->package->setAutoload($autoload);
         $ns = PluginInstaller::primaryNamespace($this->package);
@@ -127,8 +127,8 @@ class PluginInstallerTest extends TestCase
         $autoload = [
             'psr-4' => [
                 'Foo\Bar' => 'foo',
-                'Acme\Plugin' => './src'
-            ]
+                'Acme\Plugin' => './src',
+            ],
         ];
         $this->package->setAutoload($autoload);
         $ns = PluginInstaller::primaryNamespace($this->package);
@@ -137,8 +137,8 @@ class PluginInstallerTest extends TestCase
         $autoload = [
             'psr-4' => [
                 'Foo\Bar' => 'bar',
-                'Foo\\' => ''
-            ]
+                'Foo\\' => '',
+            ],
         ];
         $this->package->setAutoload($autoload);
         $ns = PluginInstaller::primaryNamespace($this->package);
@@ -147,8 +147,8 @@ class PluginInstallerTest extends TestCase
         $autoload = [
             'psr-4' => [
                 'Foo\Bar' => 'bar',
-                'Foo' => '.'
-            ]
+                'Foo' => '.',
+            ],
         ];
         $this->package->setAutoload($autoload);
         $ns = PluginInstaller::primaryNamespace($this->package);
@@ -157,8 +157,8 @@ class PluginInstallerTest extends TestCase
         $autoload = [
             'psr-4' => [
                 'Acme\Foo\Bar' => 'bar',
-                'Acme\Foo\\' => ''
-            ]
+                'Acme\Foo\\' => '',
+            ],
         ];
         $this->package->setAutoload($autoload);
         $ns = PluginInstaller::primaryNamespace($this->package);
@@ -167,8 +167,8 @@ class PluginInstallerTest extends TestCase
         $autoload = [
             'psr-4' => [
                 'Acme\Foo\Bar' => '',
-                'Acme\Foo' => 'src'
-            ]
+                'Acme\Foo' => 'src',
+            ],
         ];
         $this->package->setAutoload($autoload);
         $name = PluginInstaller::primaryNamespace($this->package);
@@ -181,22 +181,22 @@ class PluginInstallerTest extends TestCase
         $plugin1->setType('cakephp-plugin');
         $plugin1->setAutoload([
             'psr-4' => [
-                'TheThing' => 'src/'
-            ]
+                'TheThing' => 'src/',
+            ],
         ]);
 
         $plugin2 = new Package('cakephp/princess', '1.0', '1.0');
         $plugin2->setType('cakephp-plugin');
         $plugin2->setAutoload([
             'psr-4' => [
-                'Princess' => 'src/'
-            ]
+                'Princess' => 'src/',
+            ],
         ]);
 
         $packages = [
             $plugin1,
             new Package('SomethingElse', '1.0', '1.0'),
-            $plugin2
+            $plugin2,
         ];
 
         $return = PluginInstaller::determinePlugins(
@@ -207,7 +207,7 @@ class PluginInstallerTest extends TestCase
 
         $expected = [
             'Princess' => $this->path . '/vendor/cakephp/princess',
-            'TheThing' => $this->path . '/vendor/cakephp/the-thing'
+            'TheThing' => $this->path . '/vendor/cakephp/the-thing',
         ];
         $this->assertSame($expected, $return, 'Only composer-loaded plugins should be listed');
 
@@ -223,7 +223,7 @@ class PluginInstallerTest extends TestCase
             'Foo' => $this->path . '/plugins/Foo',
             'Fum' => $this->path . '/plugins/Fum',
             'Princess' => $this->path . '/vendor/cakephp/princess',
-            'TheThing' => $this->path . '/vendor/cakephp/the-thing'
+            'TheThing' => $this->path . '/vendor/cakephp/the-thing',
         ];
         $this->assertSame($expected, $return, 'Composer and application plugins should be listed');
 
@@ -240,7 +240,7 @@ class PluginInstallerTest extends TestCase
             'Foo' => $this->path . '/plugins/Foo',
             'Fum' => $this->path . '/plugins/Fum',
             'Princess' => $this->path . '/vendor/cakephp/princess',
-            'TheThing' => $this->path . '/vendor/cakephp/the-thing'
+            'TheThing' => $this->path . '/vendor/cakephp/the-thing',
         ];
         $this->assertSame($expected, $return, 'Composer and application plugins should be listed');
     }
@@ -255,7 +255,7 @@ class PluginInstallerTest extends TestCase
             'OddOneOut' => '/some/other/path',
             'Princess' => $this->path . '/vendor/cakephp/princess',
             'TheThing' => $this->path . '/vendor/cakephp/the-thing',
-            'Vendor\Plugin' => $this->path . '/vendor/vendor/plugin'
+            'Vendor\Plugin' => $this->path . '/vendor/vendor/plugin',
         ];
 
         $path = $this->path . '/vendor/cakephp-plugins.php';
@@ -295,7 +295,7 @@ class PluginInstallerTest extends TestCase
 
         $result = require $path;
         $expected = [
-            'plugins' => $plugins
+            'plugins' => $plugins,
         ];
         $expected['plugins']['Vendor/Plugin'] = $expected['plugins']['Vendor\Plugin'];
         unset($expected['plugins']['Vendor\Plugin']);
