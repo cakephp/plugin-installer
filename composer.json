@@ -13,9 +13,9 @@
         "php": "^7.2"
     },
     "require-dev": {
-        "composer/composer": "^1.0",
-        "phpunit/phpunit": "~8.5.0",
-        "cakephp/cakephp-codesniffer": "^4.1"
+        "cakephp/cakephp-codesniffer": "^4.1",
+        "composer/composer": "^2.0@dev",
+        "phpunit/phpunit": "~8.5.0"
     },
     "autoload": {
         "psr-4": {
@@ -29,5 +29,10 @@
     },
     "extra": {
         "class": "Cake\\Composer\\Installer\\PluginInstaller"
-    }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }

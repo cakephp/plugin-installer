@@ -7,6 +7,7 @@ use Cake\Test\Composer\Installer\PluginInstaller;
 use Composer\Composer;
 use Composer\Package\Package;
 use Composer\Repository\RepositoryManager;
+use Composer\Util\HttpDownloader;
 use PHPUnit\Framework\TestCase;
 
 class PluginInstallerTest extends TestCase
@@ -59,9 +60,13 @@ class PluginInstallerTest extends TestCase
         $composer->setConfig($config);
 
         $this->io = $this->getMockBuilder('Composer\IO\IOInterface')->getMock();
+
+        $httpDownloader = new HttpDownloader($this->io, $config);
+
         $rm = new RepositoryManager(
             $this->io,
-            $config
+            $config,
+            $httpDownloader
         );
         $composer->setRepositoryManager($rm);
 
