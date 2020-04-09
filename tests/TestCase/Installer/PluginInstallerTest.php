@@ -37,7 +37,7 @@ class PluginInstallerTest extends TestCase
      *
      * @return void
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->package = new Package('CamelCased', '1.0', '1.0');
@@ -68,7 +68,7 @@ class PluginInstallerTest extends TestCase
         $this->installer = new PluginInstaller($this->io, $composer);
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         parent::tearDown();
         $dirs = array_reverse($this->testDirs);
@@ -265,24 +265,24 @@ class PluginInstallerTest extends TestCase
         $this->assertFileExists($path);
         $contents = file_get_contents($path);
 
-        $this->assertContains('<?php', $contents);
-        $this->assertContains('$baseDir = dirname(dirname(__FILE__));', $contents);
-        $this->assertContains(
+        $this->assertStringContainsString('<?php', $contents);
+        $this->assertStringContainsString('$baseDir = dirname(dirname(__FILE__));', $contents);
+        $this->assertStringContainsString(
             "'Fee' => \$baseDir . '/plugins/Fee/'",
             $contents,
             'paths should be relative for app-plugins'
         );
-        $this->assertContains(
+        $this->assertStringContainsString(
             "'Princess' => \$baseDir . '/vendor/cakephp/princess/'",
             $contents,
             'paths should be relative for vendor-plugins'
         );
-        $this->assertContains(
+        $this->assertStringContainsString(
             "'OddOneOut' => '/some/other/path/'",
             $contents,
             'paths should stay absolute if it\'s not under the application root'
         );
-        $this->assertContains(
+        $this->assertStringContainsString(
             "'Vendor/Plugin' => \$baseDir . '/vendor/vendor/plugin/'",
             $contents,
             'Plugin namespaces should use forward slash'
@@ -308,9 +308,9 @@ class PluginInstallerTest extends TestCase
         $this->installer->updateConfig('DebugKit', '/vendor/cakephp/DebugKit');
         $this->assertFileExists($this->path . '/vendor/cakephp-plugins.php');
         $contents = file_get_contents($this->path . '/vendor/cakephp-plugins.php');
-        $this->assertContains('<?php', $contents);
-        $this->assertContains("'plugins' =>", $contents);
-        $this->assertContains("'DebugKit' => '/vendor/cakephp/DebugKit/'", $contents);
+        $this->assertStringContainsString('<?php', $contents);
+        $this->assertStringContainsString("'plugins' =>", $contents);
+        $this->assertStringContainsString("'DebugKit' => '/vendor/cakephp/DebugKit/'", $contents);
     }
 
     public function testUpdateConfigAddPathInvalidFile()
@@ -331,10 +331,10 @@ class PluginInstallerTest extends TestCase
 
         $this->installer->updateConfig('DebugKit', '/vendor/cakephp/DebugKit');
         $contents = file_get_contents($this->path . '/vendor/cakephp-plugins.php');
-        $this->assertContains('<?php', $contents);
-        $this->assertContains("'plugins' =>", $contents);
-        $this->assertContains("'DebugKit' => '/vendor/cakephp/DebugKit/'", $contents);
-        $this->assertContains("'Bake' => '/some/path/'", $contents);
+        $this->assertStringContainsString('<?php', $contents);
+        $this->assertStringContainsString("'plugins' =>", $contents);
+        $this->assertStringContainsString("'DebugKit' => '/vendor/cakephp/DebugKit/'", $contents);
+        $this->assertStringContainsString("'Bake' => '/some/path/'", $contents);
     }
 
     /**
@@ -351,10 +351,10 @@ class PluginInstallerTest extends TestCase
 
         $this->installer->updateConfig('DebugKit', $this->path . '/vendor/cakephp/debugkit');
         $contents = file_get_contents($this->path . '/vendor/cakephp-plugins.php');
-        $this->assertContains('<?php', $contents);
-        $this->assertContains('$baseDir = dirname(dirname(__FILE__));', $contents);
-        $this->assertContains("'DebugKit' => \$baseDir . '/vendor/cakephp/debugkit/'", $contents);
-        $this->assertContains("'Bake' => '/some/path/'", $contents);
+        $this->assertStringContainsString('<?php', $contents);
+        $this->assertStringContainsString('$baseDir = dirname(dirname(__FILE__));', $contents);
+        $this->assertStringContainsString("'DebugKit' => \$baseDir . '/vendor/cakephp/debugkit/'", $contents);
+        $this->assertStringContainsString("'Bake' => '/some/path/'", $contents);
     }
 
     /**
@@ -373,10 +373,10 @@ class PluginInstallerTest extends TestCase
         $this->installer->updateConfig('ADmad\JwtAuth', '/vendor/admad/cakephp-jwt-auth');
 
         $contents = file_get_contents($this->path . '/vendor/cakephp-plugins.php');
-        $this->assertContains('<?php', $contents);
-        $this->assertContains("'DebugKit' => '/vendor/cakephp/debugkit/'", $contents);
-        $this->assertContains("'Bake' => '/some/path/'", $contents);
-        $this->assertContains("'ADmad/JwtAuth' => '/vendor/admad/cakephp-jwt-auth/'", $contents);
+        $this->assertStringContainsString('<?php', $contents);
+        $this->assertStringContainsString("'DebugKit' => '/vendor/cakephp/debugkit/'", $contents);
+        $this->assertStringContainsString("'Bake' => '/some/path/'", $contents);
+        $this->assertStringContainsString("'ADmad/JwtAuth' => '/vendor/admad/cakephp-jwt-auth/'", $contents);
     }
 
     /**
@@ -394,8 +394,8 @@ class PluginInstallerTest extends TestCase
         $this->installer->updateConfig('DebugKit', '\vendor\cakephp\debugkit');
 
         $contents = file_get_contents($this->path . '/vendor/cakephp-plugins.php');
-        $this->assertContains('<?php', $contents);
-        $this->assertContains("'DebugKit' => '/vendor/cakephp/debugkit/'", $contents);
+        $this->assertStringContainsString('<?php', $contents);
+        $this->assertStringContainsString("'DebugKit' => '/vendor/cakephp/debugkit/'", $contents);
     }
 
     /**
@@ -412,8 +412,8 @@ class PluginInstallerTest extends TestCase
 
         $this->installer->updateConfig('Bake', '');
         $contents = file_get_contents($this->path . '/vendor/cakephp-plugins.php');
-        $this->assertContains('<?php', $contents);
-        $this->assertContains("'plugins' =>", $contents);
-        $this->assertNotContains("Bake", $contents);
+        $this->assertStringContainsString('<?php', $contents);
+        $this->assertStringContainsString("'plugins' =>", $contents);
+        $this->assertStringNotContainsString("Bake", $contents);
     }
 }
