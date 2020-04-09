@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Cake\Test\TestCase\Composer\Installer;
 
 use Cake\Test\Composer\Installer\PluginInstaller;
@@ -9,7 +11,6 @@ use PHPUnit\Framework\TestCase;
 
 class PluginInstallerTest extends TestCase
 {
-
     public $package;
 
     public $installer;

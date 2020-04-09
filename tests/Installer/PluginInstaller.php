@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Cake\Test\Composer\Installer;
 
@@ -9,7 +10,6 @@ use Cake\Composer\Installer\PluginInstaller as PluginInstallerSrc;
  */
 class PluginInstaller extends PluginInstallerSrc
 {
-
     /**
      * Overriden to return a test-config file
      *

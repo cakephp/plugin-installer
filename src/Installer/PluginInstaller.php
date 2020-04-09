@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Cake\Composer\Installer;
 
 use Composer\Composer;
@@ -22,12 +24,12 @@ class PluginInstaller extends LibraryInstaller
     /**
      * Check usage upon construction
      *
-     * @param IOInterface $io composer object
-     * @param Composer    $composer composer object
+     * @param \Composer\IO\IOInterface $io composer object
+     * @param \Composer\Composer $composer composer object
      * @param string      $type what are we loading
-     * @param Filesystem  $filesystem composer object
+     * @param \Composer\Util\Filesystem $filesystem composer object
      */
-    public function __construct(IOInterface $io, Composer $composer, $type = 'library', Filesystem $filesystem = null)
+    public function __construct(IOInterface $io, Composer $composer, $type = 'library', ?Filesystem $filesystem = null)
     {
         parent::__construct($io, $composer, $type, $filesystem);
         $this->checkUsage($composer);
@@ -39,7 +41,7 @@ class PluginInstaller extends LibraryInstaller
      * If not, warn the user they need to update their application's composer file.
      * Do nothing if the main project is not a project (if it's a plugin in development).
      *
-     * @param Composer $composer object
+     * @param \Composer\Composer $composer object
      * @return void
      */
     public function checkUsage(Composer $composer)
@@ -76,7 +78,6 @@ class PluginInstaller extends LibraryInstaller
      *
      * @param string $title Warning title
      * @param string $text warning text
-     *
      * @return void
      */
     public function warnUser($title, $text)
@@ -109,7 +110,7 @@ class PluginInstaller extends LibraryInstaller
      * Recreates CakePHP's plugin path map, based on composer information
      * and available app-plugins.
      *
-     * @param Event $event the composer event object
+     * @param \Composer\Script\Event $event the composer event object
      * @return void
      */
     public static function postAutoloadDump(Event $event)
@@ -337,7 +338,7 @@ PHP;
      */
     public function supports($packageType)
     {
-        return 'cakephp-plugin' === $packageType;
+        return $packageType === 'cakephp-plugin';
     }
 
     /**
@@ -370,7 +371,6 @@ PHP;
      * @param \Composer\Package\PackageInterface $target Updated version.
      * @return void
      * @deprecated superceeded by the post-autoload-dump hook
-     *
      * @throws \InvalidArgumentException if $initial package is not installed
      */
     public function update(InstalledRepositoryInterface $repo, PackageInterface $initial, PackageInterface $target)
