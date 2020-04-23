@@ -8,7 +8,6 @@ use Composer\Composer;
 use Composer\Config;
 use Composer\IO\IOInterface;
 use Composer\Package\Package;
-use Composer\Package\RootPackage;
 use Composer\Repository\RepositoryManager;
 use Composer\Util\HttpDownloader;
 use PHPUnit\Framework\TestCase;
