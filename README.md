@@ -1,5 +1,10 @@
 # CakePHP Plugin Installer
 
+[![Build Status](https://img.shields.io/travis/com/cakephp/plugin-installer?style=flat-square)](https://travis-ci.com/cakephp/plugin-installer)
+[![Latest Stable Version](https://img.shields.io/github/v/release/cakephp/plugin-installer?sort=semver&style=flat-square)](https://packagist.org/packages/cakephp/plugin-installer)
+[![Total Downloads](https://img.shields.io/packagist/dt/cakephp/plugin-installer?style=flat-square)](https://packagist.org/packages/cakephp/plugin-installer/stats)
+[![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE)
+
 A composer installer for installing CakePHP 3.0+ plugins.
 
 This installer ensures your application is aware of CakePHP plugins installed
