@@ -1,5 +1,6 @@
 <?php
-namespace Cake\Test\TestCase\Composer\Installer;
+
+namespace Cake\Test\Composer\TestCase\Installer;
 
 use Cake\Test\Composer\Installer\PluginInstaller;
 use Composer\Composer;
@@ -36,7 +37,7 @@ class PluginInstallerTest extends TestCase
      *
      * @return void
      */
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
         $this->package = new Package('CamelCased', '1.0', '1.0');
@@ -67,7 +68,7 @@ class PluginInstallerTest extends TestCase
         $this->installer = new PluginInstaller($this->io, $composer);
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         parent::tearDown();
         $dirs = array_reverse($this->testDirs);
@@ -112,7 +113,7 @@ class PluginInstallerTest extends TestCase
         $this->package->setAutoload($autoload);
 
         $ns = PluginInstaller::primaryNamespace($this->package);
-        $this->assertEquals('FOC\Authenticate', $ns);
+        $this->assertSame('FOC\Authenticate', $ns);
 
         $autoload = [
             'psr-4' => [
@@ -122,7 +123,7 @@ class PluginInstallerTest extends TestCase
         ];
         $this->package->setAutoload($autoload);
         $ns = PluginInstaller::primaryNamespace($this->package);
-        $this->assertEquals('FOC\Acl', $ns);
+        $this->assertSame('FOC\Acl', $ns);
 
         $autoload = [
             'psr-4' => [
@@ -132,7 +133,7 @@ class PluginInstallerTest extends TestCase
         ];
         $this->package->setAutoload($autoload);
         $ns = PluginInstaller::primaryNamespace($this->package);
-        $this->assertEquals('Acme\Plugin', $ns);
+        $this->assertSame('Acme\Plugin', $ns);
 
         $autoload = [
             'psr-4' => [
@@ -142,7 +143,7 @@ class PluginInstallerTest extends TestCase
         ];
         $this->package->setAutoload($autoload);
         $ns = PluginInstaller::primaryNamespace($this->package);
-        $this->assertEquals('Foo', $ns);
+        $this->assertSame('Foo', $ns);
 
         $autoload = [
             'psr-4' => [
@@ -152,7 +153,7 @@ class PluginInstallerTest extends TestCase
         ];
         $this->package->setAutoload($autoload);
         $ns = PluginInstaller::primaryNamespace($this->package);
-        $this->assertEquals('Foo', $ns);
+        $this->assertSame('Foo', $ns);
 
         $autoload = [
             'psr-4' => [
@@ -162,7 +163,7 @@ class PluginInstallerTest extends TestCase
         ];
         $this->package->setAutoload($autoload);
         $ns = PluginInstaller::primaryNamespace($this->package);
-        $this->assertEquals('Acme\Foo', $ns);
+        $this->assertSame('Acme\Foo', $ns);
 
         $autoload = [
             'psr-4' => [
@@ -172,7 +173,7 @@ class PluginInstallerTest extends TestCase
         ];
         $this->package->setAutoload($autoload);
         $name = PluginInstaller::primaryNamespace($this->package);
-        $this->assertEquals('Acme\Foo', $name);
+        $this->assertSame('Acme\Foo', $name);
     }
 
     public function testDeterminePlugins()
