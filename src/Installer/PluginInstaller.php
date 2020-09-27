@@ -4,8 +4,6 @@ namespace Cake\Composer\Installer;
 use Composer\Composer;
 use Composer\Installer\LibraryInstaller;
 use Composer\IO\IOInterface;
-use Composer\Package\PackageInterface;
-use Composer\Repository\InstalledRepositoryInterface;
 use Composer\Script\Event;
 use Composer\Util\Filesystem;
 use RuntimeException;
@@ -338,67 +336,6 @@ PHP;
     public function supports($packageType)
     {
         return 'cakephp-plugin' === $packageType;
-    }
-
-    /**
-     * Installs specific plugin.
-     *
-     * After the plugin is installed, app's `cakephp-plugins.php` config file is updated with
-     * plugin namespace to path mapping.
-     *
-     * @param \Composer\Repository\InstalledRepositoryInterface $repo Repository in which to check.
-     * @param \Composer\Package\PackageInterface $package Package instance.
-     * @return void
-     * @deprecated superceeded by the post-autoload-dump hook
-     */
-    public function install(InstalledRepositoryInterface $repo, PackageInterface $package)
-    {
-        parent::install($repo, $package);
-        $path = $this->getInstallPath($package);
-        $ns = static::primaryNamespace($package);
-        $this->updateConfig($ns, $path);
-    }
-
-    /**
-     * Updates specific plugin.
-     *
-     * After the plugin is installed, app's `cakephp-plugins.php` config file is updated with
-     * plugin namespace to path mapping.
-     *
-     * @param \Composer\Repository\InstalledRepositoryInterface $repo Repository in which to check.
-     * @param \Composer\Package\PackageInterface $initial Already installed package version.
-     * @param \Composer\Package\PackageInterface $target Updated version.
-     * @return void
-     * @deprecated superceeded by the post-autoload-dump hook
-     *
-     * @throws \InvalidArgumentException if $initial package is not installed
-     */
-    public function update(InstalledRepositoryInterface $repo, PackageInterface $initial, PackageInterface $target)
-    {
-        parent::update($repo, $initial, $target);
-
-        $ns = static::primaryNamespace($initial);
-        $this->updateConfig($ns, null);
-
-        $path = $this->getInstallPath($target);
-        $ns = static::primaryNamespace($target);
-        $this->updateConfig($ns, $path);
-    }
-
-    /**
-     * Uninstalls specific package.
-     *
-     * @param \Composer\Repository\InstalledRepositoryInterface $repo Repository in which to check.
-     * @param \Composer\Package\PackageInterface $package Package instance.
-     * @return void
-     * @deprecated superceeded by the post-autoload-dump hook
-     */
-    public function uninstall(InstalledRepositoryInterface $repo, PackageInterface $package)
-    {
-        parent::uninstall($repo, $package);
-        $path = $this->getInstallPath($package);
-        $ns = static::primaryNamespace($package);
-        $this->updateConfig($ns, null);
     }
 
     /**
