@@ -7,7 +7,9 @@ use Composer\Installer\LibraryInstaller;
 use Composer\Script\Event;
 
 /**
- * @deprecated No longer used since v2.0
+ * @deprecated No longer needed since v1.3.
+ *   It has been kept only to show warning to users to remove
+ *   PluginInstaller::postAutoloadDump from the "post-autoload-dump" hook.
  */
 class PluginInstaller extends LibraryInstaller
 {
