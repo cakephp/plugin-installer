@@ -70,7 +70,7 @@ class PluginInstaller extends LibraryInstaller
         ) {
             static::warnUser(
                 'Action required!',
-                'The CakePHP plugin installer v2 no longer requires the "post-autoload-dump" hook.' .
+                'The CakePHP plugin installer v1.3+ no longer requires the "post-autoload-dump" hook.' .
                 ' Please update your app\'s composer.json file and remove usage of ' . $postAutoloadDump,
                 $event->getIO()
             );
