@@ -3,13 +3,15 @@ language: php
 php:
   - 7.2
   - 7.4
+  - 'nightly'
 
 matrix:
   include:
     - php: 7.2
       env: PHPCS=1
 
-before_script: composer install
+install:
+  - composer install --no-interaction
 
 script:
   - if [[ $PHPCS != 1 ]]; then vendor/bin/phpunit; fi
