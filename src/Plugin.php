@@ -1,6 +1,4 @@
 <?php
-declare(strict_types=1);
-
 namespace Cake\Composer;
 
 use Composer\Composer;
@@ -88,8 +86,8 @@ class Plugin implements PluginInterface, EventSubscriberInterface
     public function findPlugins(
         array $packages,
         array $pluginDirs = ['plugins'],
-        string $vendorDir = 'vendor'
-    ): array {
+        $vendorDir = 'vendor'
+    ) {
         $plugins = [];
 
         foreach ($packages as $package) {
@@ -133,7 +131,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
      * @param string $vendorDir The path to the vendor dir.
      * @return string
      */
-    public function getFullPath(string $path, string $vendorDir): string
+    public function getFullPath($path, $vendorDir)
     {
         if (preg_match('{^(?:/|[a-z]:|[a-z0-9.]+://)}i', $path)) {
             return rtrim($path, '/');
@@ -154,7 +152,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
      * @param string|null $root The root directory. Defaults to a value generated from `$configFile`.
      * @return void
      */
-    public function writeConfigFile(string $configFile, array $plugins, ?string $root = null): void
+    public function writeConfigFile($configFile, array $plugins, $root = null)
     {
         $root = $root ?: dirname(dirname($configFile));
 
@@ -214,7 +212,7 @@ PHP;
      * @param string $vendorDir Path to composer-vendor dir.
      * @return string Absolute file path.
      */
-    public function getConfigFilePath(string $vendorDir): string
+    public function getConfigFilePath($vendorDir)
     {
         return $vendorDir . DIRECTORY_SEPARATOR . 'cakephp-plugins.php';
     }
@@ -226,7 +224,7 @@ PHP;
      * @return string The package's primary namespace.
      * @throws \RuntimeException When the package's primary namespace cannot be determined.
      */
-    public function getPrimaryNamespace(PackageInterface $package): string
+    public function getPrimaryNamespace(PackageInterface $package)
     {
         $primaryNs = null;
         $autoLoad = $package->getAutoload();
