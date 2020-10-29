@@ -16,7 +16,7 @@
     "require-dev": {
         "cakephp/cakephp-codesniffer": "^3.3",
         "composer/composer": "^2.0",
-        "phpunit/phpunit": "^8.5 || ^9.3"
+        "phpunit/phpunit": "^5.7 || ^6.5 || ^8.5 || ^9.3"
     },
     "autoload": {
         "psr-4": {
@@ -25,7 +25,8 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Cake\\Test\\TestCase\\Composer\\": "tests/"
+            "Cake\\Test\\TestCase\\Composer\\": "tests/TestCase/",
+            "Cake\\Test\\TestCase\\Composer\\Php56\\": "tests/php56/TestCase/"
         }
     },
     "extra": {
