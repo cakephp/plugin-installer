@@ -86,3 +86,21 @@ would be like:
     }
 }
 ```
+
+## Generating Manually
+
+If you need to generate `cakephp-plugins.php` separately, you can simply run the `dumpautoload` command:
+
+```
+composer dumpautoload
+```
+
+You cannot use `--no-scripts` with `dumpautoload` or `cakephp-plugins.php` will not generate.
+
+If you don't want to re-generate the entire autoload dump, you can run just the scripts:
+
+```
+composer run-script post-autoload-dump
+```
+
+Please see [composer documentation](https://getcomposer.org/doc/03-cli.md#dump-autoload-dumpautoload-) for details. 
