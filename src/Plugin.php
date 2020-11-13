@@ -9,7 +9,7 @@ use Composer\Plugin\PluginInterface;
 use Composer\Script\Event;
 use RuntimeException;
 
-class Plugin implements PluginInterface, EventSubscriberInterface
+final class Plugin implements PluginInterface, EventSubscriberInterface
 {
     /**
      * @inheritDoc
