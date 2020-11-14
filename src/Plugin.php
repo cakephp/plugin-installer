@@ -265,6 +265,6 @@ PHP;
             );
         }
 
-        return trim($primaryNs, '\\');
+        return trim((string)$primaryNs, '\\');
     }
 }
