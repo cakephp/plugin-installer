@@ -14,7 +14,7 @@
         "composer-plugin-api": "^2.0"
     },
     "require-dev": {
-        "cakephp/cakephp-codesniffer": "5.x-dev",
+        "cakephp/cakephp-codesniffer": "^5.0",
         "composer/composer": "^2.0",
         "phpunit/phpunit": "^9.5.19"
     },
