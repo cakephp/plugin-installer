@@ -14,32 +14,23 @@ use PHPUnit\Framework\TestCase;
 
 class PluginTest extends TestCase
 {
-    /**
-     * @var \Composer\Composer
-     */
-    protected $composer;
+    protected Composer $composer;
 
-    /**
-     * @var \Composer\Package\Package
-     */
-    protected $package;
+    protected Package $package;
 
     /**
      * @var \Composer\IO\IOInterface&\PHPUnit\Framework\MockObject\MockObject
      */
     protected $io;
 
-    /**
-     * @var \Cake\Composer\Plugin
-     */
-    protected $plugin;
+    protected Plugin $plugin;
 
     /**
      * Directories used during tests
      *
-     * @var array
+     * @var array<string>
      */
-    protected $testDirs = [
+    protected array $testDirs = [
         '',
         'vendor',
         'plugins',
@@ -50,6 +41,8 @@ class PluginTest extends TestCase
         'app_plugins',
         'app_plugins/Bar',
     ];
+
+    protected string $path;
 
     /**
      * setUp
