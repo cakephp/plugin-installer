@@ -42,7 +42,53 @@ class Plugin implements PluginInterface, EventSubscriberInterface
     {
         return [
             'post-autoload-dump' => 'postAutoloadDump',
+            'pre-autoload-dump' => 'preAutoloadDump',
         ];
+    }
+
+    /**
+     * Add PSR-4 autoload paths for app plugins.
+     *
+     * @param \Composer\Script\Event $event
+     * @return void
+     */
+    public function preAutoloadDump(Event $event): void
+    {
+        $package = $event->getComposer()->getPackage();
+        $autoload = $package->getAutoload();
+        $devAutoload = $package->getDevAutoload();
+
+        $extra = $package->getExtra();
+        if (empty($extra['plugin-paths'])) {
+            $extra['plugin-paths'] = ['plugins'];
+        }
+
+        $root = dirname(realpath($event->getComposer()->getConfig()->get('vendor-dir')));
+        foreach ($extra['plugin-paths'] as $pluginsPath) {
+            foreach (new DirectoryIterator($root . '/' . $pluginsPath) as $fileInfo) {
+                if (!$fileInfo->isDir() || $fileInfo->isDot()) {
+                    continue;
+                }
+
+                $folderName = $fileInfo->getFilename();
+                if ($folderName[0] === '.') {
+                    continue;
+                }
+
+                $pluginNamespace = $folderName . '\\';
+                $pluginTestNamespace = $folderName . '\\Test\\';
+                $path = $pluginsPath . '/' . $folderName . '/';
+                if (!isset($autoload['psr-4'][$pluginNamespace])) {
+                    $autoload['psr-4'][$pluginNamespace] = $path . 'src';
+                }
+                if (!isset($devAutoload['psr-4'][$pluginTestNamespace])) {
+                    $devAutoload['psr-4'][$pluginTestNamespace] = $path . 'tests';
+                }
+            }
+        }
+
+        $package->setAutoload($autoload);
+        $package->setDevAutoload($devAutoload);
     }
 
     /**

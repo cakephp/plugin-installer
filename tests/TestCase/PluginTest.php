@@ -8,7 +8,9 @@ use Composer\Composer;
 use Composer\Config;
 use Composer\IO\IOInterface;
 use Composer\Package\Package;
+use Composer\Package\RootPackage;
 use Composer\Repository\RepositoryManager;
+use Composer\Script\Event;
 use Composer\Util\HttpDownloader;
 use PHPUnit\Framework\TestCase;
 
@@ -67,7 +69,9 @@ class PluginTest extends TestCase
         $this->composer = new Composer();
         $config = new Config();
         $config->merge([
-            'vendor-dir' => $this->path . '/vendor',
+            'config' => [
+                'vendor-dir' => $this->path . '/vendor',
+            ],
         ]);
 
         $this->composer->setConfig($config);
@@ -109,6 +113,7 @@ class PluginTest extends TestCase
     {
         $expected = [
             'post-autoload-dump' => 'postAutoloadDump',
+            'pre-autoload-dump' => 'preAutoloadDump',
         ];
 
         $this->assertSame($expected, $this->plugin->getSubscribedEvents());
@@ -118,6 +123,54 @@ class PluginTest extends TestCase
     {
         $path = $this->plugin->getConfigFilePath('');
         $this->assertFileExists(dirname($path));
+    }
+
+    public function testPreAutoloadDump()
+    {
+        $package = new RootPackage('App', '1.0.0', '1.0.0');
+        $package->setExtra([
+            'plugin-paths' => [
+                'app_plugins',
+                'plugins',
+            ],
+        ]);
+        $package->setAutoload([
+            'psr-4' => [
+                'Foo\\' => 'xyz/Foo/src',
+            ],
+        ]);
+        $package->setDevAutoload([
+            'psr-4' => [
+                'Foo\Test\\' => 'xyz/Foo/tests',
+            ],
+        ]);
+        $this->composer->setPackage($package);
+
+        $event = new Event('', $this->composer, $this->io);
+
+        $this->plugin->preAutoloadDump($event);
+
+        $expected = [
+            'psr-4' => [
+                'Foo\\' => 'xyz/Foo/src',
+                'Fee\\' => 'plugins/Fee/src',
+                'Fum\\' => 'plugins/Fum/src',
+                'Foe\\' => 'plugins/Foe/src',
+                'Bar\\' => 'app_plugins/Bar/src',
+            ],
+        ];
+        $this->assertEquals($expected, $package->getAutoload());
+
+        $expected = [
+            'psr-4' => [
+                'Foo\Test\\' => 'xyz/Foo/tests',
+                'Fee\Test\\' => 'plugins/Fee/tests',
+                'Fum\Test\\' => 'plugins/Fum/tests',
+                'Foe\Test\\' => 'plugins/Foe/tests',
+                'Bar\Test\\' => 'app_plugins/Bar/tests',
+            ],
+        ];
+        $this->assertEquals($expected, $package->getDevAutoload());
     }
 
     public function testGetPrimaryNamespace()
