@@ -33,15 +33,14 @@ class PluginTest extends TestCase
      * @var array<string>
      */
     protected array $testDirs = [
-        '',
         'vendor',
-        'plugins',
         'plugins/Foo',
-        'plugins/Fee',
-        'plugins/Foe',
+        'plugins/Fee/src',
+        'plugins/Fee/tests',
+        'plugins/Foe/src',
         'plugins/Fum',
-        'app_plugins',
-        'app_plugins/Bar',
+        'app_plugins/Bar/src',
+        'app_plugins/Bar/tests',
     ];
 
     protected string $path;
@@ -62,7 +61,7 @@ class PluginTest extends TestCase
 
         foreach ($this->testDirs as $dir) {
             if (!is_dir($this->path . '/' . $dir)) {
-                mkdir($this->path . '/' . $dir);
+                mkdir($this->path . '/' . $dir, 0777, true);
             }
         }
 
@@ -96,16 +95,10 @@ class PluginTest extends TestCase
     {
         parent::tearDown();
 
-        $dirs = array_reverse($this->testDirs);
-
-        if (is_file($this->path . '/vendor/cakephp-plugins.php')) {
-            unlink($this->path . '/vendor/cakephp-plugins.php');
-        }
-
-        foreach ($dirs as $dir) {
-            if (is_dir($this->path . '/' . $dir)) {
-                rmdir($this->path . '/' . $dir);
-            }
+        if (PHP_OS === 'Windows') {
+            exec(sprintf('rd /s /q %s', escapeshellarg($this->path)));
+        } else {
+            exec(sprintf('rm -rf %s', escapeshellarg($this->path)));
         }
     }
 
@@ -154,7 +147,6 @@ class PluginTest extends TestCase
             'psr-4' => [
                 'Foo\\' => 'xyz/Foo/src',
                 'Fee\\' => 'plugins/Fee/src',
-                'Fum\\' => 'plugins/Fum/src',
                 'Foe\\' => 'plugins/Foe/src',
                 'Bar\\' => 'app_plugins/Bar/src',
             ],
@@ -165,8 +157,6 @@ class PluginTest extends TestCase
             'psr-4' => [
                 'Foo\Test\\' => 'xyz/Foo/tests',
                 'Fee\Test\\' => 'plugins/Fee/tests',
-                'Fum\Test\\' => 'plugins/Fum/tests',
-                'Foe\Test\\' => 'plugins/Foe/tests',
                 'Bar\Test\\' => 'app_plugins/Bar/tests',
             ],
         ];

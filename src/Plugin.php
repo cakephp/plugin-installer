@@ -63,9 +63,9 @@ class Plugin implements PluginInterface, EventSubscriberInterface
             $extra['plugin-paths'] = ['plugins'];
         }
 
-        $root = dirname(realpath($event->getComposer()->getConfig()->get('vendor-dir')));
+        $root = dirname(realpath($event->getComposer()->getConfig()->get('vendor-dir'))) . '/';
         foreach ($extra['plugin-paths'] as $pluginsPath) {
-            foreach (new DirectoryIterator($root . '/' . $pluginsPath) as $fileInfo) {
+            foreach (new DirectoryIterator($root . $pluginsPath) as $fileInfo) {
                 if (!$fileInfo->isDir() || $fileInfo->isDot()) {
                     continue;
                 }
@@ -78,10 +78,10 @@ class Plugin implements PluginInterface, EventSubscriberInterface
                 $pluginNamespace = $folderName . '\\';
                 $pluginTestNamespace = $folderName . '\\Test\\';
                 $path = $pluginsPath . '/' . $folderName . '/';
-                if (!isset($autoload['psr-4'][$pluginNamespace])) {
+                if (!isset($autoload['psr-4'][$pluginNamespace]) && is_dir($root . $path . '/src')) {
                     $autoload['psr-4'][$pluginNamespace] = $path . 'src';
                 }
-                if (!isset($devAutoload['psr-4'][$pluginTestNamespace])) {
+                if (!isset($devAutoload['psr-4'][$pluginTestNamespace]) && is_dir($root . $path . '/tests')) {
                     $devAutoload['psr-4'][$pluginTestNamespace] = $path . 'tests';
                 }
             }
