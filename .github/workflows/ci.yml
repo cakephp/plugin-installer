@@ -10,7 +10,7 @@ on:
 
 jobs:
   testsuite-linux:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
       matrix:
@@ -62,7 +62,7 @@ jobs:
 
   cs-stan:
     name: Coding Standard & Static Analysis
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-22.04
 
     steps:
     - uses: actions/checkout@v2
@@ -73,7 +73,7 @@ jobs:
         php-version: '7.4'
         extensions: mbstring, intl
         coverage: none
-        tools: psalm:~4.1.0, cs2pr
+        tools: phive, cs2pr
 
     - name: Composer Install
       run: composer install
@@ -81,5 +81,9 @@ jobs:
     - name: Run phpcs
       run: vendor/bin/phpcs --report=checkstyle src/ tests/ | cs2pr
 
+    - name: Install PHP tools with phive.
+      run: phive install --trust-gpg-keys 'CF1A108D0E7AE720,51C67305FFC2E5C0,12CE0F1D262429A5'
+
     - name: Run psalm
-      run: psalm --output-format=github
+      if: always()
+      run: tools/psalm --output-format=github
