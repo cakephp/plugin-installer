@@ -4,6 +4,7 @@
 * text eol=lf
 
 # Remove files for archives generated using `git archive`
+.phive export-ignore
 .editorconfig export-ignore
 phpunit.xml.dist export-ignore
 phpcs.xml.dist export-ignore

@@ -8,7 +8,9 @@ use Composer\Composer;
 use Composer\Config;
 use Composer\IO\IOInterface;
 use Composer\Package\Package;
+use Composer\Package\RootPackage;
 use Composer\Repository\RepositoryManager;
+use Composer\Script\Event;
 use Composer\Util\HttpDownloader;
 use PHPUnit\Framework\TestCase;
 
@@ -31,15 +33,14 @@ class PluginTest extends TestCase
      * @var array<string>
      */
     protected array $testDirs = [
-        '',
         'vendor',
-        'plugins',
         'plugins/Foo',
-        'plugins/Fee',
-        'plugins/Foe',
+        'plugins/Fee/src',
+        'plugins/Fee/tests',
+        'plugins/Foe/src',
         'plugins/Fum',
-        'app_plugins',
-        'app_plugins/Bar',
+        'app_plugins/Bar/src',
+        'app_plugins/Bar/tests',
     ];
 
     protected string $path;
@@ -60,14 +61,16 @@ class PluginTest extends TestCase
 
         foreach ($this->testDirs as $dir) {
             if (!is_dir($this->path . '/' . $dir)) {
-                mkdir($this->path . '/' . $dir);
+                mkdir($this->path . '/' . $dir, 0777, true);
             }
         }
 
         $this->composer = new Composer();
         $config = new Config();
         $config->merge([
-            'vendor-dir' => $this->path . '/vendor',
+            'config' => [
+                'vendor-dir' => $this->path . '/vendor',
+            ],
         ]);
 
         $this->composer->setConfig($config);
@@ -92,16 +95,10 @@ class PluginTest extends TestCase
     {
         parent::tearDown();
 
-        $dirs = array_reverse($this->testDirs);
-
-        if (is_file($this->path . '/vendor/cakephp-plugins.php')) {
-            unlink($this->path . '/vendor/cakephp-plugins.php');
-        }
-
-        foreach ($dirs as $dir) {
-            if (is_dir($this->path . '/' . $dir)) {
-                rmdir($this->path . '/' . $dir);
-            }
+        if (PHP_OS === 'Windows') {
+            exec(sprintf('rd /s /q %s', escapeshellarg($this->path)));
+        } else {
+            exec(sprintf('rm -rf %s', escapeshellarg($this->path)));
         }
     }
 
@@ -109,6 +106,7 @@ class PluginTest extends TestCase
     {
         $expected = [
             'post-autoload-dump' => 'postAutoloadDump',
+            'pre-autoload-dump' => 'preAutoloadDump',
         ];
 
         $this->assertSame($expected, $this->plugin->getSubscribedEvents());
@@ -118,6 +116,51 @@ class PluginTest extends TestCase
     {
         $path = $this->plugin->getConfigFilePath('');
         $this->assertFileExists(dirname($path));
+    }
+
+    public function testPreAutoloadDump()
+    {
+        $package = new RootPackage('App', '1.0.0', '1.0.0');
+        $package->setExtra([
+            'plugin-paths' => [
+                'app_plugins',
+                'plugins',
+            ],
+        ]);
+        $package->setAutoload([
+            'psr-4' => [
+                'Foo\\' => 'xyz/Foo/src',
+            ],
+        ]);
+        $package->setDevAutoload([
+            'psr-4' => [
+                'Foo\Test\\' => 'xyz/Foo/tests',
+            ],
+        ]);
+        $this->composer->setPackage($package);
+
+        $event = new Event('', $this->composer, $this->io);
+
+        $this->plugin->preAutoloadDump($event);
+
+        $expected = [
+            'psr-4' => [
+                'Foo\\' => 'xyz/Foo/src',
+                'Fee\\' => 'plugins/Fee/src',
+                'Foe\\' => 'plugins/Foe/src',
+                'Bar\\' => 'app_plugins/Bar/src',
+            ],
+        ];
+        $this->assertEquals($expected, $package->getAutoload());
+
+        $expected = [
+            'psr-4' => [
+                'Foo\Test\\' => 'xyz/Foo/tests',
+                'Fee\Test\\' => 'plugins/Fee/tests',
+                'Bar\Test\\' => 'app_plugins/Bar/tests',
+            ],
+        ];
+        $this->assertEquals($expected, $package->getDevAutoload());
     }
 
     public function testGetPrimaryNamespace()
