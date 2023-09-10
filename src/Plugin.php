@@ -65,6 +65,9 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 
         $root = dirname(realpath($event->getComposer()->getConfig()->get('vendor-dir'))) . '/';
         foreach ($extra['plugin-paths'] as $pluginsPath) {
+            if (!is_dir($root . $pluginsPath)) {
+                continue;
+            }
             foreach (new DirectoryIterator($root . $pluginsPath) as $fileInfo) {
                 if (!$fileInfo->isDir() || $fileInfo->isDot()) {
                     continue;
