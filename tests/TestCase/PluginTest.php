@@ -163,6 +163,45 @@ class PluginTest extends TestCase
         $this->assertEquals($expected, $package->getDevAutoload());
     }
 
+    public function testPreAutoloadDumpNonExistentPluginPaths()
+    {
+        $package = new RootPackage('App', '1.0.0', '1.0.0');
+        $package->setExtra([
+            'plugin-paths' => [
+                'unknown_folder',
+            ],
+        ]);
+        $package->setAutoload([
+            'psr-4' => [
+                'Foo\\' => 'xyz/Foo/src',
+            ],
+        ]);
+        $package->setDevAutoload([
+            'psr-4' => [
+                'Foo\Test\\' => 'xyz/Foo/tests',
+            ],
+        ]);
+        $this->composer->setPackage($package);
+
+        $event = new Event('', $this->composer, $this->io);
+
+        $this->plugin->preAutoloadDump($event);
+
+        $expected = [
+            'psr-4' => [
+                'Foo\\' => 'xyz/Foo/src',
+            ],
+        ];
+        $this->assertEquals($expected, $package->getAutoload());
+
+        $expected = [
+            'psr-4' => [
+                'Foo\Test\\' => 'xyz/Foo/tests',
+            ],
+        ];
+        $this->assertEquals($expected, $package->getDevAutoload());
+    }
+
     public function testGetPrimaryNamespace()
     {
         $autoload = [
