@@ -1,6 +1,6 @@
 {
     "name": "cakephp/plugin-installer",
-    "description": "A composer installer for CakePHP 3.0+ plugins.",
+    "description": "A composer installer for CakePHP plugins.",
     "type": "composer-plugin",
     "license": "MIT",
     "authors": [
