@@ -5,7 +5,7 @@
 [![Total Downloads](https://img.shields.io/packagist/dt/cakephp/plugin-installer?style=flat-square)](https://packagist.org/packages/cakephp/plugin-installer/stats)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE)
 
-A composer installer for installing CakePHP 3.0+ plugins.
+A composer installer for installing CakePHP plugins.
 
 This installer ensures your application is aware of CakePHP plugins installed
 by composer in `vendor/`.
