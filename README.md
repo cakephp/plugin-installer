@@ -1,6 +1,6 @@
 # CakePHP Plugin Installer
 
-![Build Status](https://github.com/cakephp/plugin-installer/actions/workflows/ci.yml/badge.svg?branch=master)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/cakephp/plugin-installer/ci.yml?style=flat-square)](https://github.com/cakephp/plugin-installer/actions/workflows/ci.yml)
 [![Latest Stable Version](https://img.shields.io/github/v/release/cakephp/plugin-installer?sort=semver&style=flat-square)](https://packagist.org/packages/cakephp/plugin-installer)
 [![Total Downloads](https://img.shields.io/packagist/dt/cakephp/plugin-installer?style=flat-square)](https://packagist.org/packages/cakephp/plugin-installer/stats)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE)
