@@ -53,6 +53,7 @@
         ],
         "stan-tests": "phpstan.phar analyze -c tests/phpstan.neon",
         "stan-baseline": "phpstan.phar --generate-baseline",
+        "psalm-baseline": "tools/psalm --set-baseline=psalm-baseline.xml",
         "stan-setup": "phive install",
         "test": "phpunit"
     }
