@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<files psalm-version="4.x-dev@">
+<files psalm-version="5.20.0@3f284e96c9d9be6fe6b15c79416e1d1903dcfef4">
   <file src="src/Plugin.php">
-    <InvalidArgument occurrences="1">
-      <code>$pathMap</code>
-    </InvalidArgument>
+    <RiskyTruthyFalsyComparison>
+      <code>!$primaryNs</code>
+      <code>$root</code>
+    </RiskyTruthyFalsyComparison>
   </file>
 </files>
