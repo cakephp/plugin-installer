@@ -48,7 +48,7 @@ the autoload section would be like:
 ```json
 "autoload": {
     "psr-4": {
-        "MyPlugin\\": "src"
+        "MyPlugin\\": "src/"
     }
 }
 ```
@@ -59,13 +59,13 @@ also have an "autoload-dev" section for loading test files:
 ```json
 "autoload": {
     "psr-4": {
-        "MyPlugin\\": "src"
+        "MyPlugin\\": "src/"
     }
 },
 "autoload-dev": {
     "psr-4": {
-        "MyPlugin\\Test\\": "tests",
-        "Cake\\Test\\" : "vendor/cakephp/cakephp/test"
+        "MyPlugin\\Test\\": "tests/",
+        "Cake\\Test\\" : "vendor/cakephp/cakephp/tests/"
     }
 }
 ```
@@ -76,13 +76,13 @@ would be like:
 ```json
 "autoload": {
     "psr-4": {
-        "MyVendor\\MyPlugin\\": "src"
+        "MyVendor\\MyPlugin\\": "src/"
     }
 },
 "autoload-dev": {
     "psr-4": {
-        "MyVendor\\MyPlugin\\Test\\": "tests",
-        "Cake\\Test\\" : "vendor/cakephp/cakephp/test"
+        "MyVendor\\MyPlugin\\Test\\": "tests/",
+        "Cake\\Test\\" : "vendor/cakephp/cakephp/tests/"
     }
 }
 ```
