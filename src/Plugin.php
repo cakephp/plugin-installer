@@ -138,7 +138,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
     public function findPlugins(
         array $packages,
         array $pluginDirs = ['plugins'],
-        string $vendorDir = 'vendor'
+        string $vendorDir = 'vendor',
     ): array {
         $plugins = [];
 
@@ -217,7 +217,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
             $pluginPath = str_replace(
                 DIRECTORY_SEPARATOR . DIRECTORY_SEPARATOR,
                 DIRECTORY_SEPARATOR,
-                $pluginPath
+                $pluginPath,
             );
 
             // Namespaced plugins should use /
@@ -248,7 +248,7 @@ PHP;
         $root = str_replace(
             DIRECTORY_SEPARATOR . DIRECTORY_SEPARATOR,
             DIRECTORY_SEPARATOR,
-            $root
+            $root,
         );
 
         // Normalize to *nix paths.
@@ -313,8 +313,8 @@ PHP;
                     'Unable to get primary namespace for package %s.' .
                     "\nEnsure you have added proper 'autoload' section to your plugin's config" .
                     ' as stated in README on https://github.com/cakephp/plugin-installer',
-                    $package->getName()
-                )
+                    $package->getName(),
+                ),
             );
         }
 
