@@ -84,7 +84,7 @@ class PluginTest extends TestCase
         $rm = new RepositoryManager(
             $this->io,
             $config,
-            $httpDownloader
+            $httpDownloader,
         );
         $this->composer->setRepositoryManager($rm);
 
@@ -302,7 +302,7 @@ class PluginTest extends TestCase
         $return = $this->plugin->findPlugins(
             $packages,
             [$this->path . '/doesnt-exist'],
-            $this->path . '/vendor'
+            $this->path . '/vendor',
         );
 
         $expected = [
@@ -314,7 +314,7 @@ class PluginTest extends TestCase
         $return = $this->plugin->findPlugins(
             $packages,
             [$this->path . '/plugins'],
-            $this->path . '/vendor'
+            $this->path . '/vendor',
         );
 
         $expected = [
@@ -330,7 +330,7 @@ class PluginTest extends TestCase
         $return = $this->plugin->findPlugins(
             $packages,
             [$this->path . '/plugins', $this->path . '/app_plugins'],
-            $this->path . '/vendor'
+            $this->path . '/vendor',
         );
 
         $expected = [
@@ -369,22 +369,22 @@ class PluginTest extends TestCase
         $this->assertStringContainsString(
             "'Fee' => \$baseDir . '/plugins/Fee/'",
             $contents,
-            'paths should be relative for app-plugins'
+            'paths should be relative for app-plugins',
         );
         $this->assertStringContainsString(
             "'Princess' => \$baseDir . '/vendor/cakephp/princess/'",
             $contents,
-            'paths should be relative for vendor-plugins'
+            'paths should be relative for vendor-plugins',
         );
         $this->assertStringContainsString(
             "'OddOneOut' => '/some/other/path/'",
             $contents,
-            'paths should stay absolute if it\'s not under the application root'
+            'paths should stay absolute if it\'s not under the application root',
         );
         $this->assertStringContainsString(
             "'Vendor/Plugin' => \$baseDir . '/vendor/vendor/plugin/'",
             $contents,
-            'Plugin namespaces should use forward slash'
+            'Plugin namespaces should use forward slash',
         );
 
         // Ensure all plugin paths are slash terminated
@@ -403,7 +403,7 @@ class PluginTest extends TestCase
         $this->assertSame(
             $expected,
             $result,
-            'The evaluated result should be the same as the input except for namespaced plugin'
+            'The evaluated result should be the same as the input except for namespaced plugin',
         );
     }
 }

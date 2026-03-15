@@ -2,3 +2,4 @@
 /composer.lock
 /tools
 .phpunit.result.cache
+.phpcs.cache
