@@ -39,6 +39,8 @@ class PluginTest extends TestCase
         'plugins/Fee/tests',
         'plugins/Foe/src',
         'plugins/Fum',
+        'plugins/YourVendor/YourPlugin/src',
+        'plugins/YourVendor/YourPlugin/tests',
         'app_plugins/Bar/src',
         'app_plugins/Bar/tests',
     ];
@@ -148,6 +150,7 @@ class PluginTest extends TestCase
                 'Foo\\' => 'xyz/Foo/src',
                 'Fee\\' => 'plugins/Fee/src',
                 'Foe\\' => 'plugins/Foe/src',
+                'YourVendor\\YourPlugin\\' => 'plugins/YourVendor/YourPlugin/src',
                 'Bar\\' => 'app_plugins/Bar/src',
             ],
         ];
@@ -157,6 +160,7 @@ class PluginTest extends TestCase
             'psr-4' => [
                 'Foo\Test\\' => 'xyz/Foo/tests',
                 'Fee\Test\\' => 'plugins/Fee/tests',
+                'YourVendor\\YourPlugin\\Test\\' => 'plugins/YourVendor/YourPlugin/tests',
                 'Bar\Test\\' => 'app_plugins/Bar/tests',
             ],
         ];
@@ -324,6 +328,7 @@ class PluginTest extends TestCase
             'Fum' => $this->path . '/plugins/Fum',
             'Princess' => $this->path . '/vendor/cakephp/princess',
             'TheThing' => $this->path . '/vendor/cakephp/the-thing',
+            'YourVendor/YourPlugin' => $this->path . '/plugins/YourVendor/YourPlugin',
         ];
         $this->assertSame($expected, $return, 'Composer and application plugins should be listed');
 
@@ -341,6 +346,7 @@ class PluginTest extends TestCase
             'Fum' => $this->path . '/plugins/Fum',
             'Princess' => $this->path . '/vendor/cakephp/princess',
             'TheThing' => $this->path . '/vendor/cakephp/the-thing',
+            'YourVendor/YourPlugin' => $this->path . '/plugins/YourVendor/YourPlugin',
         ];
         $this->assertSame($expected, $return, 'Composer and application plugins should be listed');
     }
