@@ -65,48 +65,20 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 
         $root = dirname(realpath($event->getComposer()->getConfig()->get('vendor-dir'))) . '/';
         foreach ($extra['plugin-paths'] as $pluginsPath) {
-            if (!is_dir($root . $pluginsPath)) {
+            $pluginPath = $root . $pluginsPath;
+            if (!is_dir($pluginPath)) {
                 continue;
             }
-            foreach (new DirectoryIterator($root . $pluginsPath) as $fileInfo) {
-                if (!$fileInfo->isDir() || $fileInfo->isDot() || $fileInfo->getFilename()[0] === '.') {
-                    continue;
+            foreach ($this->findAppPlugins($pluginPath) as $pluginName => $pluginPath) {
+                $namespace = str_replace('/', '\\', $pluginName) . '\\';
+                $testNamespace = $namespace . 'Test\\';
+                $path = $this->getRelativePath($pluginPath, $root);
+
+                if (!isset($autoload['psr-4'][$namespace])) {
+                    $autoload['psr-4'][$namespace] = $path . '/src';
                 }
-
-                $folderName = $fileInfo->getFilename();
-                $path = $pluginsPath . '/' . $folderName . '/';
-
-                if (is_dir($root . $path . '/src')) {
-                    // Level 1: plugins/MyPlugin/src/
-                    $ns = $folderName . '\\';
-                    $testNs = $folderName . '\\Test\\';
-                    if (!isset($autoload['psr-4'][$ns])) {
-                        $autoload['psr-4'][$ns] = $path . 'src';
-                    }
-                    if (!isset($devAutoload['psr-4'][$testNs]) && is_dir($root . $path . '/tests')) {
-                        $devAutoload['psr-4'][$testNs] = $path . 'tests';
-                    }
-                } elseif (is_dir($root . $path)) {
-                    // Level 2: plugins/YourVendor/YourPlugin/src/ — vendor-namespaced app plugins only.
-                    // No deeper nesting is supported beyond this second level.
-                    foreach (new DirectoryIterator($root . $path) as $subInfo) {
-                        if (!$subInfo->isDir() || $subInfo->isDot() || $subInfo->getFilename()[0] === '.') {
-                            continue;
-                        }
-                        $subName = $subInfo->getFilename();
-                        $subPath = $path . $subName . '/';
-                        if (!is_dir($root . $subPath . '/src')) {
-                            continue;
-                        }
-                        $ns = $folderName . '\\' . $subName . '\\';
-                        $testNs = $folderName . '\\' . $subName . '\\Test\\';
-                        if (!isset($autoload['psr-4'][$ns])) {
-                            $autoload['psr-4'][$ns] = $subPath . 'src';
-                        }
-                        if (!isset($devAutoload['psr-4'][$testNs]) && is_dir($root . $subPath . '/tests')) {
-                            $devAutoload['psr-4'][$testNs] = $subPath . 'tests';
-                        }
-                    }
+                if (!isset($devAutoload['psr-4'][$testNamespace]) && is_dir($pluginPath . '/tests')) {
+                    $devAutoload['psr-4'][$testNamespace] = $path . '/tests';
                 }
             }
         }
@@ -178,43 +150,97 @@ class Plugin implements PluginInterface, EventSubscriberInterface
             if (!is_dir($path)) {
                 continue;
             }
-            foreach (new DirectoryIterator($path) as $info) {
-                if (!$info->isDir() || $info->isDot() || $info->getFilename()[0] === '.') {
-                    continue;
-                }
-
-                $name = $info->getFilename();
-                $pluginPath = $path . DIRECTORY_SEPARATOR . $name;
-
-                if (is_dir($pluginPath . DIRECTORY_SEPARATOR . 'src')) {
-                    // Level 1: plugins/MyPlugin/
-                    $plugins[$name] = $pluginPath;
-                } else {
-                    // Level 2: plugins/YourVendor/YourPlugin/ — vendor-namespaced app plugins only.
-                    // No deeper nesting is supported beyond this second level.
-                    // Dirs with no src/ and no plugin children are registered as-is for backward compatibility.
-                    $hasVendoredPlugins = false;
-                    foreach (new DirectoryIterator($pluginPath) as $subInfo) {
-                        if (!$subInfo->isDir() || $subInfo->isDot() || $subInfo->getFilename()[0] === '.') {
-                            continue;
-                        }
-                        $subName = $subInfo->getFilename();
-                        $subPluginPath = $pluginPath . DIRECTORY_SEPARATOR . $subName;
-                        if (is_dir($subPluginPath . DIRECTORY_SEPARATOR . 'src')) {
-                            $plugins[$name . '/' . $subName] = $subPluginPath;
-                            $hasVendoredPlugins = true;
-                        }
-                    }
-                    if (!$hasVendoredPlugins) {
-                        $plugins[$name] = $pluginPath;
-                    }
-                }
-            }
+            $plugins += $this->findAppPlugins($path, true);
         }
 
         ksort($plugins);
 
         return $plugins;
+    }
+
+    /**
+     * Find application plugins in a plugin path.
+     *
+     * Supports both `plugins/MyPlugin/src` and `plugins/Vendor/Plugin/src`.
+     * When requested, top-level directories with no plugin children are kept
+     * for backward compatibility.
+     *
+     * @param string $path The absolute plugin path.
+     * @param bool $keepLegacyDirectories Whether to keep legacy top-level entries.
+     * @return array<string, string>
+     */
+    protected function findAppPlugins(string $path, bool $keepLegacyDirectories = false): array
+    {
+        $plugins = [];
+
+        foreach (new DirectoryIterator($path) as $info) {
+            if ($this->shouldSkipDirectory($info)) {
+                continue;
+            }
+
+            $name = $info->getFilename();
+            $pluginPath = $info->getPathname();
+            if ($this->isPluginDirectory($pluginPath)) {
+                $plugins[$name] = $pluginPath;
+
+                continue;
+            }
+
+            $vendorPlugins = [];
+            foreach (new DirectoryIterator($pluginPath) as $subInfo) {
+                if ($this->shouldSkipDirectory($subInfo)) {
+                    continue;
+                }
+
+                $subName = $subInfo->getFilename();
+                $subPluginPath = $subInfo->getPathname();
+                if ($this->isPluginDirectory($subPluginPath)) {
+                    $vendorPlugins[$name . '/' . $subName] = $subPluginPath;
+                }
+            }
+
+            if ($vendorPlugins) {
+                $plugins += $vendorPlugins;
+
+                continue;
+            }
+            if ($keepLegacyDirectories) {
+                $plugins[$name] = $pluginPath;
+            }
+        }
+
+        return $plugins;
+    }
+
+    /**
+     * @param \DirectoryIterator $info Directory iterator entry.
+     * @return bool
+     */
+    protected function shouldSkipDirectory(DirectoryIterator $info): bool
+    {
+        return !$info->isDir() || $info->isDot() || $info->getFilename()[0] === '.';
+    }
+
+    /**
+     * @param string $path Directory path.
+     * @return bool
+     */
+    protected function isPluginDirectory(string $path): bool
+    {
+        return is_dir($path . DIRECTORY_SEPARATOR . 'src');
+    }
+
+    /**
+     * @param string $path Absolute plugin path.
+     * @param string $root Absolute application root path.
+     * @return string
+     */
+    protected function getRelativePath(string $path, string $root): string
+    {
+        $path = str_replace('\\', '/', $path);
+        $root = str_replace('\\', '/', $root);
+
+        return trim(substr($path, strlen($root)), '/');
     }
 
     /**
