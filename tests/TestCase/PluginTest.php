@@ -202,6 +202,25 @@ class PluginTest extends TestCase
         $this->assertEquals($expected, $package->getDevAutoload());
     }
 
+    public function testGetPrimaryNamespaceWithPathLists()
+    {
+        $this->package->setAutoload([
+            'psr-4' => [
+                'Acme\\Foo\\Test\\' => 'tests/',
+                'Acme\\Foo\\' => ['lib/', 'src/'],
+            ],
+        ]);
+        $this->assertSame('Acme\\Foo', $this->plugin->getPrimaryNamespace($this->package));
+
+        $this->package->setAutoload([
+            'psr-4' => [
+                'Acme\\Foo\\Test\\' => ['tests/'],
+                'Acme\\Foo\\' => ['', 'lib/'],
+            ],
+        ]);
+        $this->assertSame('Acme\\Foo', $this->plugin->getPrimaryNamespace($this->package));
+    }
+
     public function testGetPrimaryNamespace()
     {
         $autoload = [
