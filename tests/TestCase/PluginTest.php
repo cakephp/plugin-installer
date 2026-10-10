@@ -373,6 +373,26 @@ class PluginTest extends TestCase
         $this->assertSame($this->path . '/plugins/Fee', $return['Fee']);
     }
 
+    public function testFindPluginsNamespacedAppPluginOverridesVendorPlugin()
+    {
+        $package = new Package('your-vendor/your-plugin', '1.0', '1.0');
+        $package->setType('cakephp-plugin');
+        $package->setAutoload([
+            'psr-4' => [
+                'YourVendor\\YourPlugin\\' => 'src/',
+            ],
+        ]);
+
+        $return = $this->plugin->findPlugins(
+            [$package],
+            [$this->path . '/plugins'],
+            $this->path . '/vendor',
+        );
+
+        $this->assertSame($this->path . '/plugins/YourVendor/YourPlugin', $return['YourVendor/YourPlugin']);
+        $this->assertArrayNotHasKey('YourVendor\\YourPlugin', $return);
+    }
+
     public function testWriteConfigFile()
     {
         $plugins = [

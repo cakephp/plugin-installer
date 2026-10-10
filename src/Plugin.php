@@ -140,7 +140,8 @@ class Plugin implements PluginInterface, EventSubscriberInterface
                 continue;
             }
 
-            $ns = $this->getPrimaryNamespace($package);
+            // Same key format as app plugins, so `Vendor/Plugin` in plugins/ can replace it.
+            $ns = str_replace('\\', '/', $this->getPrimaryNamespace($package));
             $path = $vendorDir . DIRECTORY_SEPARATOR . $package->getPrettyName();
             $plugins[$ns] = $path;
         }
