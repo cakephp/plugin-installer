@@ -2,6 +2,12 @@
     "name": "cakephp/plugin-installer",
     "description": "A composer installer for CakePHP plugins.",
     "type": "composer-plugin",
+    "keywords": [
+        "cakephp",
+        "plugin",
+        "installer",
+        "composer-plugin"
+    ],
     "license": "MIT",
     "authors": [
         {
@@ -9,6 +15,10 @@
             "homepage": "https://cakephp.org"
         }
     ],
+    "support": {
+        "issues": "https://github.com/cakephp/plugin-installer/issues",
+        "source": "https://github.com/cakephp/plugin-installer"
+    },
     "require": {
         "php": ">=8.1",
         "composer-plugin-api": "^2.0"
@@ -47,8 +57,6 @@
         "cs-fix": "phpcbf",
         "phpstan": "tools/phpstan analyse",
         "stan": "@phpstan",
-        "stan-tests": "phpstan.phar analyze -c tests/phpstan.neon",
-        "stan-baseline": "phpstan.phar --generate-baseline",
         "stan-setup": "phive install",
         "test": "phpunit"
     }
