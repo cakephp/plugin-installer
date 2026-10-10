@@ -3,7 +3,7 @@
 [![Build Status](https://img.shields.io/github/actions/workflow/status/cakephp/plugin-installer/ci.yml?style=flat-square)](https://github.com/cakephp/plugin-installer/actions/workflows/ci.yml)
 [![Latest Stable Version](https://img.shields.io/github/v/release/cakephp/plugin-installer?sort=semver&style=flat-square)](https://packagist.org/packages/cakephp/plugin-installer)
 [![Total Downloads](https://img.shields.io/packagist/dt/cakephp/plugin-installer?style=flat-square)](https://packagist.org/packages/cakephp/plugin-installer/stats)
-[![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE)
+[![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.txt)
 
 A composer installer for installing CakePHP plugins.
 
@@ -16,7 +16,7 @@ Your CakePHP application should already depend on `cakephp/plugin-installer`, if
 not in your CakePHP application run:
 
 ```
-composer require cakephp/plugin-installer:*
+composer require cakephp/plugin-installer
 ```
 
 Your plugins themselves do **not** need to require `cakephp/plugin-installer`. They

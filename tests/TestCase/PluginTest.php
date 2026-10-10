@@ -11,6 +11,7 @@ use Composer\Package\Package;
 use Composer\Package\RootPackage;
 use Composer\Repository\RepositoryManager;
 use Composer\Script\Event;
+use Composer\Util\Filesystem;
 use Composer\Util\HttpDownloader;
 use PHPUnit\Framework\TestCase;
 
@@ -21,7 +22,7 @@ class PluginTest extends TestCase
     protected Package $package;
 
     /**
-     * @var \Composer\IO\IOInterface&\PHPUnit\Framework\MockObject\MockObject
+     * @var \Composer\IO\IOInterface&\PHPUnit\Framework\MockObject\Stub
      */
     protected $io;
 
@@ -60,7 +61,7 @@ class PluginTest extends TestCase
         $this->package = new Package('cake/plugin', '1.0', '1.0');
         $this->package->setType('cakephp-plugin');
 
-        $this->path = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'plugin-installer-test';
+        $this->path = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'plugin-installer-test-' . bin2hex(random_bytes(4));
 
         foreach ($this->testDirs as $dir) {
             if (!is_dir($this->path . '/' . $dir)) {
@@ -78,9 +79,7 @@ class PluginTest extends TestCase
 
         $this->composer->setConfig($config);
 
-        /** @var \Composer\IO\IOInterface&\PHPUnit\Framework\MockObject\MockObject $io */
-        $io = $this->getMockBuilder(IOInterface::class)->getMock();
-        $this->io = $io;
+        $this->io = $this->createStub(IOInterface::class);
 
         $httpDownloader = new HttpDownloader($this->io, $config);
 
@@ -98,11 +97,7 @@ class PluginTest extends TestCase
     {
         parent::tearDown();
 
-        if (PHP_OS === 'Windows') {
-            exec(sprintf('rd /s /q %s', escapeshellarg($this->path)));
-        } else {
-            exec(sprintf('rm -rf %s', escapeshellarg($this->path)));
-        }
+        (new Filesystem())->removeDirectory($this->path);
     }
 
     public function testGetSubscribedEvents()
