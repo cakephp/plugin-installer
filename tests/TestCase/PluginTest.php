@@ -354,6 +354,25 @@ class PluginTest extends TestCase
         $this->assertSame($expected, $return, 'Composer and application plugins should be listed');
     }
 
+    public function testFindPluginsAppPluginOverridesVendorPlugin()
+    {
+        $package = new Package('cakephp/fee', '1.0', '1.0');
+        $package->setType('cakephp-plugin');
+        $package->setAutoload([
+            'psr-4' => [
+                'Fee' => 'src/',
+            ],
+        ]);
+
+        $return = $this->plugin->findPlugins(
+            [$package],
+            [$this->path . '/plugins'],
+            $this->path . '/vendor',
+        );
+
+        $this->assertSame($this->path . '/plugins/Fee', $return['Fee']);
+    }
+
     public function testWriteConfigFile()
     {
         $plugins = [
